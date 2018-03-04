@@ -260,7 +260,7 @@ BEGIN
     POPUP "&Instrument"
     BEGIN
         MENUITEM "&New Instrument",             ID_INSTRUMENT_NEW
-        MENUITEM "&Remove Instrument",          ID_INSTRUMENT_REMOVE
+        MENUITEM "&Remove Iinstrument",          ID_INSTRUMENT_REMOVE
         MENUITEM "&Clone Instrument",           ID_INSTRUMENT_CLONE
         MENUITEM "&Deep Clone Instrument",      ID_INSTRUMENT_DEEPCLONE
         MENUITEM SEPARATOR
