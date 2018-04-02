@@ -2871,21 +2871,28 @@ void CPatternEditor::BeginMouseSelection(const CPoint &point)
 
 void CPatternEditor::ContinueMouseSelection(const CPoint &point)
 {
-	const bool bControl = IsControlPressed();
+	const bool ctrlKey = IsControlPressed();
 	const int ChannelCount = GetChannelCount();
 	const int FrameCount = GetFrameCount();
 	const int Track = GetSelectedTrack();
 
+	// Selection extends from m_selection.m_cpStart to PointPos, unordered+inclusive.
 	CCursorPos PointPos = GetCursorAtPoint(point);
 
 	// Selecting or dragging
+	if (PointPos.m_iRow < 0 || PointPos.m_iRow > GetCurrentPatternLength(PointPos.m_iFrame) - 1) {
+		printf("this should never happen");
+	}
+	if (PointPos.m_iChannel < 0 || PointPos.m_iChannel > ChannelCount - 1) {
+		printf("this can happen if you drag left/right");
+	}
 	PointPos.m_iRow = std::max(PointPos.m_iRow, 0);
 	PointPos.m_iRow = std::min(PointPos.m_iRow, GetCurrentPatternLength(PointPos.m_iFrame) - 1);		// // //
 	PointPos.m_iChannel = std::max(PointPos.m_iChannel, 0);
 	PointPos.m_iChannel = std::min(PointPos.m_iChannel, ChannelCount - 1);
 
 	if (m_bDragStart) {
-		// Dragging
+		// Drag and drop
 		if (abs(m_ptSelStartPoint.x - point.x) > m_iDragThresholdX || abs(m_ptSelStartPoint.y - point.y) > m_iDragThresholdY) {
 			// Initiate OLE drag & drop
 			PointPos = GetCursorAtPoint(m_ptSelStartPoint);		// // //
@@ -2906,8 +2913,11 @@ void CPatternEditor::ContinueMouseSelection(const CPoint &point)
 		}
 	}
 	else if (!m_pView->IsDragging()) {
-		// Expand selection
-		if (bControl || m_bCompactMode) {		// // //
+		// Not drag and drop. Handle selection.
+
+		// Compact mode || Ctrl-mousedrag = full-channel selection.
+		// Lock PointPos and m_selection.m_cpStart to full columns.
+		if (ctrlKey || m_bCompactMode) {		// // //
 			bool Compact = m_bCompactMode; // temp
 			m_bCompactMode = false;
 			if (PointPos.m_iChannel >= m_selection.m_cpStart.m_iChannel) {
@@ -2928,8 +2938,11 @@ void CPatternEditor::ContinueMouseSelection(const CPoint &point)
 			m_selection.m_cpEnd.m_iFrame = PointPos.m_iFrame;		// // //
 			m_selection.m_cpEnd.m_iColumn = GetChannelColumns(GetChannelCount() - 1);
 		}
-		else
+		else {
 			SetSelectionEnd(PointPos);
+		}
+		m_cpCursorPos.m_iChannel = m_selection.m_cpEnd.m_iChannel;
+		m_cpCursorPos.m_iColumn = m_selection.m_cpEnd.m_iColumn;
 
 		int Warp = PointPos.m_iFrame / FrameCount;		// // //
 		if (PointPos.m_iFrame % FrameCount < 0) Warp--;
