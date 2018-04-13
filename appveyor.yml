@@ -1,0 +1,19 @@
+version: build{build}
+image: Visual Studio 2017
+configuration:
+- Release
+- Debug
+clone_depth: 1
+build:
+  project: 0cc-x64.vcxproj
+  parallel: true
+  verbosity: minimal
+after_build:
+- cmd: >-
+    cd %configuration%
+
+    if %configuration%==Release ( move *.exe j0CC-PR%APPVEYOR_PULL_REQUEST_NUMBER%-%APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%-%APPVEYOR_BUILD_VERSION%.exe ) else ( move *.exe j0CC-PR%APPVEYOR_PULL_REQUEST_NUMBER%-%APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%-%APPVEYOR_BUILD_VERSION%-%configuration%.exe )
+artifacts:
+- path: $(configuration)\*.exe
+  name: exe
+deploy: off
