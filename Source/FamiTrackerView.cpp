@@ -144,6 +144,7 @@ BEGIN_MESSAGE_MAP(CFamiTrackerView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_MBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_WM_XBUTTONDOWN()		// // //
 	ON_WM_MENUCHAR()
@@ -706,6 +707,11 @@ void CFamiTrackerView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	m_pPatternEditor->OnMouseDblClk(point);
 	InvalidateCursor();
 	CView::OnLButtonDblClk(nFlags, point);
+}
+
+void CFamiTrackerView::OnMButtonDown(UINT nFlags, CPoint point) {
+	m_pPatternEditor->onMiddleClick(point);
+	CView::OnMButtonDown(nFlags, point);
 }
 
 void CFamiTrackerView::OnXButtonDown(UINT nFlags, UINT nButton, CPoint point)		// // //

@@ -128,6 +128,7 @@ public:
 	bool OnMouseNcMove();
 	void OnMouseMove(UINT nFlags, const CPoint &point);
 	void OnMouseDblClk(const CPoint &point);
+	void onMiddleClick(CPoint point);
 	void OnMouseScroll(int Delta);
 	void OnMouseRDown(const CPoint &point);
 
