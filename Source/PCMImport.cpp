@@ -195,7 +195,7 @@ BEGIN_MESSAGE_MAP(CPCMImport, CDialog)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
-	ON_BN_CLICKED(IDC_PREVIEW, &CPCMImport::OnBnClickedPreview)
+	ON_BN_CLICKED(IDC_PREVIEW, OnBnClickedPreview)
 END_MESSAGE_MAP()
 
 CDSample *CPCMImport::ShowDialog()

@@ -54,8 +54,8 @@ BEGIN_MESSAGE_MAP(CRecordSettingsDlg, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_RECORDER_INTERVAL, OnEnChangeEditRecorderInterval)
 	ON_EN_CHANGE(IDC_EDIT_RECORDER_COUNT, OnEnChangeEditRecorderCount)
 	ON_BN_CLICKED(IDC_CHECK_RECORDER_RESET, OnBnClickedCheckRecorderReset)
-	ON_EN_KILLFOCUS(IDC_EDIT_RECORDER_INTERVAL, &CRecordSettingsDlg::OnEnKillfocusEditRecorderInterval)
-	ON_EN_KILLFOCUS(IDC_EDIT_RECORDER_COUNT, &CRecordSettingsDlg::OnEnKillfocusEditRecorderCount)
+	ON_EN_KILLFOCUS(IDC_EDIT_RECORDER_INTERVAL, OnEnKillfocusEditRecorderInterval)
+	ON_EN_KILLFOCUS(IDC_EDIT_RECORDER_COUNT, OnEnKillfocusEditRecorderCount)
 END_MESSAGE_MAP()
 
 

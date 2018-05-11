@@ -54,7 +54,7 @@ void CConfigMixer::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CConfigMixer, CPropertyPage)
 	ON_WM_VSCROLL()
-	ON_BN_CLICKED(IDC_BUTTON_MIXER_RESET, &CConfigMixer::OnBnClickedButtonMixerReset)
+	ON_BN_CLICKED(IDC_BUTTON_MIXER_RESET, OnBnClickedButtonMixerReset)
 END_MESSAGE_MAP()
 
 

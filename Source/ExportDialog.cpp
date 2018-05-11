@@ -116,7 +116,7 @@ void CExportDialog::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CExportDialog, CDialog)
 	ON_BN_CLICKED(IDC_CLOSE, OnBnClickedClose)
-	ON_BN_CLICKED(IDC_EXPORT, &CExportDialog::OnBnClickedExport)
+	ON_BN_CLICKED(IDC_EXPORT, OnBnClickedExport)
 	ON_BN_CLICKED(IDC_PLAY, OnBnClickedPlay)
 END_MESSAGE_MAP()
 

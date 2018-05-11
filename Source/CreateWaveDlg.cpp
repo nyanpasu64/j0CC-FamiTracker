@@ -51,9 +51,9 @@ void CCreateWaveDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CCreateWaveDlg, CDialog)
-	ON_BN_CLICKED(IDC_BEGIN, &CCreateWaveDlg::OnBnClickedBegin)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_LOOP, &CCreateWaveDlg::OnDeltaposSpinLoop)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_TIME, &CCreateWaveDlg::OnDeltaposSpinTime)
+	ON_BN_CLICKED(IDC_BEGIN, OnBnClickedBegin)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_LOOP, OnDeltaposSpinLoop)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_TIME, OnDeltaposSpinTime)
 END_MESSAGE_MAP()
 
 int CCreateWaveDlg::GetFrameLoopCount() const

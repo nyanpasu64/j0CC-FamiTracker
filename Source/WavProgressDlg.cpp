@@ -48,7 +48,7 @@ void CWavProgressDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CWavProgressDlg, CDialog)
-	ON_BN_CLICKED(IDC_CANCEL, &CWavProgressDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDC_CANCEL, OnBnClickedCancel)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 

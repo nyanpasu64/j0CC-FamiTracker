@@ -62,7 +62,7 @@ void CInstrumentEditorFDSEnvelope::SelectInstrument(std::shared_ptr<CInstrument>
 
 
 BEGIN_MESSAGE_MAP(CInstrumentEditorFDSEnvelope, CInstrumentEditPanel)
-	ON_CBN_SELCHANGE(IDC_TYPE, &CInstrumentEditorFDSEnvelope::OnCbnSelchangeType)
+	ON_CBN_SELCHANGE(IDC_TYPE, OnCbnSelchangeType)
 END_MESSAGE_MAP()
 
 // CInstrumentEditorFDSEnvelope message handlers
