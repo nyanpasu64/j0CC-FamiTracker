@@ -35,7 +35,7 @@
 #include "VisualizerWnd.h"
 #include "TextExporter.h"
 #include "ConfigGeneral.h"
-#include "ConfigVersion.h"		// // //
+#include "Configversion.h"		// // //
 #include "ConfigAppearance.h"
 #include "ConfigMIDI.h"
 #include "ConfigSound.h"

@@ -20,7 +20,7 @@
 
 #include "../stdafx.h"
 #include "APU.h"
-#include "FDS.h"
+#include "FDS.H"
 #include "FDSSound.h"
 #include "../RegisterState.h"		// // //
 

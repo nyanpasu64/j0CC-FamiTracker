@@ -22,7 +22,7 @@
 #include "../Common.h"
 #include "Types.h"
 #include "Mixer.h"
-#include "MMC5.h"
+#include "MMC5.H"
 #include "Square.h"
 #include "../RegisterState.h"		// // //
 

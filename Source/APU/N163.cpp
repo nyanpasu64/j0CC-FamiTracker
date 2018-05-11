@@ -22,7 +22,7 @@
 
 #include "../Common.h"
 #include "APU.h"
-#include "N163.h"
+#include "N163.H"
 #include "../RegisterState.h"		// // //
 
 /*
