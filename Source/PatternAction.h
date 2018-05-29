@@ -74,25 +74,33 @@ class CPatternAction : public Action
 public:
 	enum ACTIONS
 	{
-		ACT_EDIT_NOTE,
-		ACT_REPLACE_NOTE,		// // //
-		ACT_INSERT_ROW,
-		ACT_DELETE_ROW,
-		ACT_INCREASE,
-		ACT_DECREASE,
-		ACT_EDIT_PASTE,		// // //
-		ACT_EDIT_DELETE,
-		ACT_EDIT_DELETE_ROWS,
-		ACT_INSERT_SEL_ROWS,
-		ACT_TRANSPOSE,
-		ACT_SCROLL_VALUES,
-		ACT_INTERPOLATE,
-		ACT_REVERSE,
-		ACT_REPLACE_INSTRUMENT,
+		ACT_EDIT_NOTE,			// Keyboard entry, in ANY COLUMN (including instr/vol/effect)
+
+		ACT_INCREASE,			// Numpad + (instr/vol/effect under caret)
+		ACT_DECREASE,			// Numpad - (instr/vol/effect under caret)
+		ACT_SCROLL_VALUES,		// Shift+Scroll (caret or selection)
+
+		ACT_TRANSPOSE,			// Ctrl+Scroll (caret or selection) 
+
+		ACT_REPLACE_NOTE,		// Find-replace, in ANY COLUMN
+
+		ACT_INSERT_SEL_ROWS,	// Selection + Numpad Insert
+		ACT_INSERT_ROW,			// Numpad Insert
+		
+		ACT_DELETE_ROW,			// Delete/Backspace
+		ACT_EDIT_DELETE,		// Selection + Delete
+		ACT_EDIT_DELETE_ROWS,	// Selection + Backspace
+
 		ACT_DRAG_AND_DROP,
-		ACT_PATTERN_LENGTH,
-		ACT_STRETCH_PATTERN,		// // //
-		ACT_EFFECT_COLUMNS,		// // //
+		ACT_EDIT_PASTE,			// Many different modes
+
+		ACT_INTERPOLATE,		// Ctrl+G
+		ACT_REVERSE,
+		ACT_REPLACE_INSTRUMENT,	// Selection instrs = highlighted
+
+		ACT_PATTERN_LENGTH,		// CMainFrame::SetRowCount
+		ACT_STRETCH_PATTERN,	// Pattern/etc.
+		ACT_EFFECT_COLUMNS,		// Effect column arrows
 	};
 
 // protected:
