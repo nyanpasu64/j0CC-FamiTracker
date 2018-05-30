@@ -29,6 +29,15 @@
 #include "PatternEditor.h"
 #include "PatternAction.h"
 
+
+// // // all dependencies on CMainFrame
+#define GET_VIEW(main) static_cast<CFamiTrackerView*>(main->GetActiveView())
+#define GET_MODULE(main) GET_VIEW(main)->GetModuleData()
+#define GET_SONG_VIEW(main) GET_VIEW(main)->GetSongView()
+#define GET_PATTERN_EDITOR(main) GET_VIEW(main)->GetPatternEditor()
+#define UPDATE_CONTROLS(main) main->UpdateControls()
+
+
 // struct CPatternEditorState
 
 CPatternEditorState::CPatternEditorState(const CPatternEditor *pEditor, int Track) :
@@ -171,6 +180,14 @@ PasteAction::PasteAction(int iAction) :
 	m_pAuxiliaryClipData(NULL) {
 }
 
+PasteAction::PasteAction(ACTIONS action, CPatternClipData * clipData, paste_mode_t mode,
+	paste_pos_t pos) :
+		PasteAction(action) {
+	m_pClipData = clipData;
+	m_iPasteMode = mode;
+	m_iPastePos = pos;
+}
+
 PasteAction::~PasteAction() {
 	SAFE_RELEASE(m_pClipData);
 	SAFE_RELEASE(m_pUndoClipData);
@@ -232,6 +249,10 @@ void PasteAction::Undo(CMainFrame *pMainFrm) const {
 	}
 }
 
+/**
+ * Preconditions: RestoreUndoState (cursor etc. is in right position)
+ * Postconditions: Cursor may not be in right place, but who cares.
+ */
 void PasteAction::Redo(CMainFrame *pMainFrm) const {
 	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
 	CFamiTrackerDoc *pDoc = pView->GetDocument();
@@ -400,6 +421,83 @@ std::optional<CSelection> PasteAction::SetTargetSelection(CPatternEditor *pPatte
 }
 
 // };
+
+//class SwapPasteAction : CPatternAction {
+
+SwapPasteAction::SwapPasteAction(
+	//CSelection src, paste_pos_t targetType
+) : CPatternAction(ACT_PASTE_SWAP)
+	//:
+	//src(src),
+	//targetType(targetType)
+{}
+
+// bool SwapPasteAction::Commit(CMainFrame *main) if Commit had existed
+/**
+ * Preconditions: 
+ * Postconditions: ???
+ */
+bool SwapPasteAction::SaveState(const CMainFrame *main) {
+	// FORWARD: selection to cursor
+	// BACKWARD: cursor to selection
+	
+	CPatternEditor *patternEditor = GET_PATTERN_EDITOR(main);
+
+	auto srcSelect = patternEditor->GetSelection();
+	auto destCursor = patternEditor->GetCursor();
+	//this->SaveRedoState(main);	// The selection should stay in place.
+
+	// Copy input selection to output cursor
+	this->forward = std::make_unique<PasteAction>(ACT_EDIT_PASTE,
+		patternEditor->Copy(), PASTE_DEFAULT, PASTE_CURSOR);
+	forward->SaveUndoState(main);
+	if (!forward->SaveState(main)) return false;
+	forward->SaveRedoState(main);
+
+	// Swap cursor and selection
+	patternEditor->MoveCursor(srcSelect.m_cpStart);
+	// assert(patternEditor->GetSelection().m_cpStart == destCursor);
+
+	// Copy output selection to input cursor
+	this->backward = std::make_unique<PasteAction>(ACT_EDIT_PASTE,
+		patternEditor->Copy(), PASTE_DEFAULT, PASTE_CURSOR);
+	backward->SaveUndoState(main);
+	if (!backward->SaveState(main)) return false;
+	backward->SaveRedoState(main);
+
+	// Move cursor to "after swap" position.
+	auto mutMain = const_cast<CMainFrame*>(main);
+
+	this->RestoreUndoState(mutMain);
+	//backward->RestoreUndoState(mutMain);
+	//forward->RestoreRedoState(mutMain);
+
+	return true;
+}
+
+void SwapPasteAction::Undo(CMainFrame *main) const {
+	forward->RestoreUndoState(main);
+	forward->Undo(main);
+
+	backward->RestoreRedoState(main);
+	backward->Undo(main);
+
+	//this->RestoreUndoState(main);
+}
+
+/**
+ * Preconditions: 
+ */
+void SwapPasteAction::Redo(CMainFrame *main) const {
+	forward->RestoreUndoState(main);
+	forward->Redo(main);	// Precondition: RestoreUndoState or equivalent
+	
+	backward->RestoreUndoState(main);
+	backward->Redo(main);	// Precondition: RestoreUndoState or equivalent
+
+	this->RestoreUndoState(main);
+};
+
 
 
 CPSelectionAction::CPSelectionAction(int iAction) :

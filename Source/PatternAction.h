@@ -24,6 +24,7 @@
 
 #include <vector>		// // //
 #include <optional>
+#include <memory>
 #include "Action.h"
 #include "PatternEditorTypes.h"
 
@@ -93,6 +94,7 @@ public:
 
 		ACT_DRAG_AND_DROP,
 		ACT_EDIT_PASTE,			// Many different modes
+		ACT_PASTE_SWAP,
 
 		ACT_INTERPOLATE,		// Ctrl+G
 		ACT_REVERSE,
@@ -133,8 +135,19 @@ protected:
 
 
 class PasteAction : public CPatternAction {
+	const CPatternClipData *m_pClipData;
+	CPatternClipData *m_pUndoClipData, *m_pAuxiliaryClipData;		// // //
+	paste_mode_t m_iPasteMode;		// // //
+	paste_pos_t m_iPastePos;		// // //
+
+	bool m_bDragDelete;
+	bool m_bDragMix;
+	CSelection m_dragTarget;
+
 public:
 	PasteAction(int iAction);
+	PasteAction(ACTIONS iAction, CPatternClipData *clipData, paste_mode_t mode,
+		paste_pos_t pos);
 	~PasteAction();
 
 public:
@@ -150,16 +163,26 @@ public:
 private:
 	std::optional<CSelection> SetTargetSelection(CPatternEditor * pPatternEditor);
 
-	const CPatternClipData *m_pClipData;
-	CPatternClipData *m_pUndoClipData, *m_pAuxiliaryClipData;		// // //
-	paste_mode_t m_iPasteMode;		// // //
-	paste_pos_t m_iPastePos;		// // //
-
-	bool m_bDragDelete;
-	bool m_bDragMix;
-	CSelection m_dragTarget;
 };
 
+
+class SwapPasteAction : public CPatternAction {
+public:
+	SwapPasteAction(
+		//CSelection src, paste_pos_t targetType
+	);
+
+private:
+	CSelection src;
+	paste_pos_t targetType;
+
+	std::unique_ptr<PasteAction> forward;
+	std::unique_ptr<PasteAction> backward;
+
+	bool SaveState(const CMainFrame *main) override;
+	void Undo(CMainFrame *pMainFrm) const override;
+	void Redo(CMainFrame *pMainFrm) const override;
+};
 
 /*!
 	\brief Specialization of the pattern action class for actions operating on a selection without
