@@ -53,10 +53,11 @@ void CCompoundAction::Redo(CMainFrame *pMainFrm) const
 	while (true) {
 		(*it)->Redo(pMainFrm);
 		if (++it == end) break;
-		if (!m_bFirst) continue;
-		(*it)->SaveUndoState(pMainFrm);
-		if (!(*it)->SaveState(pMainFrm))
-			throw new std::runtime_error(_T("Unable to create action."));
+		if (m_bFirst) {
+			(*it)->SaveUndoState(pMainFrm);
+			if (!(*it)->SaveState(pMainFrm))
+				throw new std::runtime_error(_T("Unable to create action."));
+		}
 	}
 	m_bFirst = false;
 }
