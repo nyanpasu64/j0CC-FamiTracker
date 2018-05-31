@@ -937,7 +937,7 @@ void CFamiTrackerView::OnEditPaste()
 	CPatternClipData *pClipData = new CPatternClipData();
 	pClipData->FromMem(hMem);
 	// Create an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_DEFAULT);		// // //
 	pAction->SetPastePos(m_iPastePos);
@@ -956,7 +956,7 @@ void CFamiTrackerView::OnEditPasteMix()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);		// // //
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);		// // //
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_MIX);		// // //
 	pAction->SetPastePos(m_iPastePos);
@@ -975,7 +975,7 @@ void CFamiTrackerView::OnEditPasteOverwrite()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_OVERWRITE);
 	pAction->SetPastePos(m_iPastePos);
@@ -994,7 +994,7 @@ void CFamiTrackerView::OnEditPasteInsert()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_INSERT);
 	pAction->SetPastePos(m_iPastePos);

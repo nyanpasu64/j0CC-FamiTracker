@@ -29,7 +29,7 @@
 #include "PatternEditor.h"
 #include "PatternAction.h"
 
-// // // Pattern editor state class
+// struct CPatternEditorState
 
 CPatternEditorState::CPatternEditorState(const CPatternEditor *pEditor, int Track) :
 	Track(Track),
@@ -47,10 +47,9 @@ void CPatternEditorState::ApplyState(CPatternEditor *pEditor) const
 	pEditor->InvalidateCursor();
 }
 
-// CPatternAction /////////////////////////////////////////////////////////////////
-//
-// Undo/redo commands for pattern editor
-//
+// };
+
+// class CPatternAction : public Action
 
 // // // for note writes
 #define STATE_EXPAND(st) (st)->Track, (st)->Cursor.m_iFrame, (st)->Cursor.m_iChannel, (st)->Cursor.m_iRow
@@ -58,39 +57,220 @@ void CPatternEditorState::ApplyState(CPatternEditor *pEditor) const
 CPatternAction::CPatternAction(int iAction) : 
 	Action(iAction),
 	m_pUndoState(nullptr),
-	m_pRedoState(nullptr),
-	m_pClipData(NULL), 
-	m_pUndoClipData(NULL),
-	m_pAuxiliaryClipData(NULL)		// // //
+	m_pRedoState(nullptr)
 {
 }
+
 
 CPatternAction::~CPatternAction()
 {
 	SAFE_RELEASE(m_pUndoState);		// // //
 	SAFE_RELEASE(m_pRedoState);		// // //
+}
 
+
+void CPatternAction::DeleteSelection(CMainFrame *pMainFrm, const CSelection &Sel) const		// // //
+{
+	auto it = CPatternIterator::FromSelection(Sel,
+		static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetDocument(),
+		pMainFrm->GetSelectedTrack());
+	const column_t ColStart = GetSelectColumn(it.first.m_iColumn);
+	const column_t ColEnd = GetSelectColumn(it.second.m_iColumn);
+
+	stChanNote NoteData, Blank;
+
+	do for (int i = it.first.m_iChannel; i <= it.second.m_iChannel; ++i) {
+		it.first.Get(i, &NoteData);
+		CopyNoteSection(&NoteData, &Blank, PASTE_DEFAULT,
+						i == it.first.m_iChannel ? ColStart : COLUMN_NOTE,
+						i == it.second.m_iChannel ? ColEnd : COLUMN_EFF4);
+		it.first.Set(i, &NoteData);
+	} while (++it.first <= it.second);
+}
+
+bool CPatternAction::ValidateSelection(const CMainFrame *pMainFrm) const		// // //
+{
+	if (!m_pUndoState->IsSelecting)
+		return false;
+	switch (static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetPatternEditor()
+		->GetSelectionCondition(m_pUndoState->Selection)) {
+	case SEL_CLEAN:
+		return true;
+	case SEL_REPEATED_ROW:
+		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_REPEATED_ROW); break;
+	case SEL_NONTERMINAL_SKIP:
+		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_NONTERMINAL_SKIP); break;
+	case SEL_TERMINAL_SKIP:
+		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_TERMINAL_SKIP); break;
+	}
+	MessageBeep(MB_ICONWARNING);
+	return false;
+}
+
+void CPatternAction::UpdateView(CFamiTrackerDoc *pDoc) const		// // //
+{
+	pDoc->UpdateAllViews(NULL, UPDATE_PATTERN);
+	pDoc->UpdateAllViews(NULL, UPDATE_FRAME); // cursor might have moved to different channel
+}
+
+std::pair<CPatternIterator, CPatternIterator> CPatternAction::GetIterators(const CMainFrame *pMainFrm) const
+{
+	auto pDoc = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetDocument();
+	return m_pUndoState->IsSelecting ?
+		CPatternIterator::FromSelection(m_pUndoState->Selection, pDoc, m_pUndoState->Track) :
+		CPatternIterator::FromCursor(m_pUndoState->Cursor, pDoc, m_pUndoState->Track);
+}
+
+// Undo / Redo base methods
+
+void CPatternAction::SaveUndoState(const CMainFrame *pMainFrm)		// // //
+{
+	// Save undo cursor position
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	const CPatternEditor *pPatternEditor = pView->GetPatternEditor(); // TODO: remove
+
+	SAFE_RELEASE(m_pUndoState);
+	m_pUndoState = new CPatternEditorState {pPatternEditor, pMainFrm->GetSelectedTrack()};
+	
+	m_bSelecting = pPatternEditor->IsSelecting();
+	m_selection = pPatternEditor->GetSelection();
+}
+
+void CPatternAction::SaveRedoState(const CMainFrame *pMainFrm)		// // //
+{
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	SAFE_RELEASE(m_pRedoState);
+	m_pRedoState = new CPatternEditorState {pView->GetPatternEditor(), pMainFrm->GetSelectedTrack()};
+	UpdateView(pView->GetDocument());
+}
+
+void CPatternAction::RestoreUndoState(CMainFrame *pMainFrm) const		// // //
+{
+	if (!m_pUndoState) return;
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	m_pUndoState->ApplyState(pView->GetPatternEditor());
+	UpdateView(pView->GetDocument());
+}
+
+void CPatternAction::RestoreRedoState(CMainFrame *pMainFrm) const		// // //
+{
+	if (!m_pRedoState) return;
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	m_pRedoState->ApplyState(pView->GetPatternEditor());
+	UpdateView(pView->GetDocument());
+}
+
+// };
+
+// class PasteAction : CPatternAction {
+
+PasteAction::PasteAction(int iAction) :
+	CPatternAction(iAction),
+	m_pClipData(NULL),
+	m_pUndoClipData(NULL),
+	m_pAuxiliaryClipData(NULL) {
+}
+
+PasteAction::~PasteAction() {
 	SAFE_RELEASE(m_pClipData);
 	SAFE_RELEASE(m_pUndoClipData);
 	SAFE_RELEASE(m_pAuxiliaryClipData);
 }
 
-void CPatternAction::SetPaste(CPatternClipData *pClipData)
+
+bool PasteAction::SaveState(const CMainFrame *pMainFrm) {
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	CFamiTrackerDoc *pDoc = pView->GetDocument();
+	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
+
+	// Save old state
+	switch (m_iAction) {
+	case ACT_DRAG_AND_DROP:
+		if (m_bDragDelete)
+			m_pAuxiliaryClipData = pPatternEditor->CopyRaw();
+		// fallthrough
+	case ACT_EDIT_PASTE: {
+		// Assigns selection region to pPatternEditor.
+			// (What does it have to do with SaveState? Nothing.)
+		// Also returns selection region, for undo purposes.
+		auto selMaybe = SetTargetSelection(pPatternEditor);
+		if (!selMaybe) return false;
+
+		m_newSelection = *selMaybe;
+		m_pUndoClipData = pPatternEditor->CopyRaw();
+		break;
+	}
+#ifdef _DEBUG
+	default:
+		AfxMessageBox(_T("TODO Implement action for this command"));
+#endif
+	}
+
+	return true;
+}
+
+void PasteAction::Undo(CMainFrame *pMainFrm) const {
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	CFamiTrackerDoc *pDoc = pView->GetDocument();
+	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
+
+	switch (m_iAction) {
+	case ACT_EDIT_PASTE:		// // //
+		pPatternEditor->SetSelection(m_newSelection);		// // //
+		pPatternEditor->PasteRaw(m_pUndoClipData);
+		break;
+	case ACT_DRAG_AND_DROP:
+		pPatternEditor->SetSelection(m_newSelection);
+		pPatternEditor->PasteRaw(m_pUndoClipData);
+		if (m_bDragDelete)
+			pPatternEditor->PasteRaw(m_pAuxiliaryClipData, m_selection.GetNormalized().m_cpStart);
+		break;
+#ifdef _DEBUG
+	default:
+		AfxMessageBox(_T("TODO Undo for this action is not implemented"));
+#endif
+	}
+}
+
+void PasteAction::Redo(CMainFrame *pMainFrm) const {
+	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
+	CFamiTrackerDoc *pDoc = pView->GetDocument();
+	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
+
+	switch (m_iAction) {
+	case ACT_EDIT_PASTE:
+		pPatternEditor->Paste(m_pClipData, m_iPasteMode, m_iPastePos);		// // //
+		break;		// // //
+	case ACT_DRAG_AND_DROP:
+		pPatternEditor->SetSelection(m_selection);
+		if (m_bDragDelete)
+			DeleteSelection(pMainFrm, m_selection);		// // //
+		pPatternEditor->DragPaste(m_pClipData, &m_dragTarget, m_bDragMix);
+		break;
+#ifdef _DEBUG
+	default:
+		AfxMessageBox(_T("TODO: Redo for this action is not implemented"));
+#endif
+	}
+}
+
+
+void PasteAction::SetPaste(CPatternClipData *pClipData)
 {
 	m_pClipData = pClipData;
 }
 
-void CPatternAction::SetPasteMode(paste_mode_t Mode)		// // //
+void PasteAction::SetPasteMode(paste_mode_t Mode)		// // //
 {
 	m_iPasteMode = Mode;
 }
 
-void CPatternAction::SetPastePos(paste_pos_t Pos)		// // //
+void PasteAction::SetPastePos(paste_pos_t Pos)		// // //
 {
 	m_iPastePos = Pos;
 }
 
-void CPatternAction::SetDragAndDrop(const CPatternClipData *pClipData, bool bDelete, bool bMix, const CSelection *pDragTarget)
+void PasteAction::SetDragAndDrop(const CPatternClipData *pClipData, bool bDelete, bool bMix, const CSelection *pDragTarget)
 {
 	m_pClipData		= pClipData;
 	m_bDragDelete	= bDelete;
@@ -99,13 +279,14 @@ void CPatternAction::SetDragAndDrop(const CPatternClipData *pClipData, bool bDel
 	m_iPastePos		= PASTE_DRAG;
 }
 
+
 /**
  * Constructs a *pasting* target selection, based on m_iPastePos.
  * Then assigns selection to GUI (pPatternEditor), and returns selection.
  *
  * If "bad" paste is rejected by user: doesn't modify GUI selection, and returns {}.
 */
-std::optional<CSelection> CPatternAction::SetTargetSelection(CPatternEditor *pPatternEditor)		// // //
+std::optional<CSelection> PasteAction::SetTargetSelection(CPatternEditor *pPatternEditor)		// // //
 {
 	// TODO: Move to PasteAction class.
 	// SaveState calls SetTargetSelection and warns on "bad" pastes.
@@ -218,176 +399,7 @@ std::optional<CSelection> CPatternAction::SetTargetSelection(CPatternEditor *pPa
 	}
 }
 
-void CPatternAction::DeleteSelection(CMainFrame *pMainFrm, const CSelection &Sel) const		// // //
-{
-	auto it = CPatternIterator::FromSelection(Sel,
-		static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetDocument(),
-		pMainFrm->GetSelectedTrack());
-	const column_t ColStart = GetSelectColumn(it.first.m_iColumn);
-	const column_t ColEnd = GetSelectColumn(it.second.m_iColumn);
-
-	stChanNote NoteData, Blank;
-
-	do for (int i = it.first.m_iChannel; i <= it.second.m_iChannel; ++i) {
-		it.first.Get(i, &NoteData);
-		CopyNoteSection(&NoteData, &Blank, PASTE_DEFAULT,
-						i == it.first.m_iChannel ? ColStart : COLUMN_NOTE,
-						i == it.second.m_iChannel ? ColEnd : COLUMN_EFF4);
-		it.first.Set(i, &NoteData);
-	} while (++it.first <= it.second);
-}
-
-bool CPatternAction::ValidateSelection(const CMainFrame *pMainFrm) const		// // //
-{
-	if (!m_pUndoState->IsSelecting)
-		return false;
-	switch (static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetPatternEditor()
-		->GetSelectionCondition(m_pUndoState->Selection)) {
-	case SEL_CLEAN:
-		return true;
-	case SEL_REPEATED_ROW:
-		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_REPEATED_ROW); break;
-	case SEL_NONTERMINAL_SKIP:
-		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_NONTERMINAL_SKIP); break;
-	case SEL_TERMINAL_SKIP:
-		static_cast<CFrameWnd*>(AfxGetMainWnd())->SetMessageText(IDS_SEL_TERMINAL_SKIP); break;
-	}
-	MessageBeep(MB_ICONWARNING);
-	return false;
-}
-
-void CPatternAction::UpdateView(CFamiTrackerDoc *pDoc) const		// // //
-{
-	pDoc->UpdateAllViews(NULL, UPDATE_PATTERN);
-	pDoc->UpdateAllViews(NULL, UPDATE_FRAME); // cursor might have moved to different channel
-}
-
-std::pair<CPatternIterator, CPatternIterator> CPatternAction::GetIterators(const CMainFrame *pMainFrm) const
-{
-	auto pDoc = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetDocument();
-	return m_pUndoState->IsSelecting ?
-		CPatternIterator::FromSelection(m_pUndoState->Selection, pDoc, m_pUndoState->Track) :
-		CPatternIterator::FromCursor(m_pUndoState->Cursor, pDoc, m_pUndoState->Track);
-}
-
-// Undo / Redo base methods
-
-bool CPatternAction::SaveState(const CMainFrame *pMainFrm)
-{
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	CFamiTrackerDoc *pDoc = pView->GetDocument();
-	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
-
-	// Save old state
-	switch (m_iAction) {
-		case ACT_DRAG_AND_DROP:
-			if (m_bDragDelete)
-				m_pAuxiliaryClipData = pPatternEditor->CopyRaw();
-		// fallthrough
-		case ACT_EDIT_PASTE: {
-			// Assigns selection region to pPatternEditor.
-				// (What does it have to do with SaveState? Nothing.)
-			// Also returns selection region, for undo purposes.
-			auto selMaybe = SetTargetSelection(pPatternEditor);
-			if (!selMaybe) return false;
-
-			m_newSelection = *selMaybe;
-			m_pUndoClipData = pPatternEditor->CopyRaw();
-			break;
-		}
-#ifdef _DEBUG
-		default:
-			AfxMessageBox(_T("TODO Implement action for this command"));
-#endif
-	}
-
-	return true;
-}
-
-void CPatternAction::SaveUndoState(const CMainFrame *pMainFrm)		// // //
-{
-	// Save undo cursor position
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	const CPatternEditor *pPatternEditor = pView->GetPatternEditor(); // TODO: remove
-
-	SAFE_RELEASE(m_pUndoState);
-	m_pUndoState = new CPatternEditorState {pPatternEditor, pMainFrm->GetSelectedTrack()};
-	
-	m_bSelecting = pPatternEditor->IsSelecting();
-	m_selection = pPatternEditor->GetSelection();
-}
-
-void CPatternAction::SaveRedoState(const CMainFrame *pMainFrm)		// // //
-{
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	SAFE_RELEASE(m_pRedoState);
-	m_pRedoState = new CPatternEditorState {pView->GetPatternEditor(), pMainFrm->GetSelectedTrack()};
-	UpdateView(pView->GetDocument());
-}
-
-void CPatternAction::RestoreUndoState(CMainFrame *pMainFrm) const		// // //
-{
-	if (!m_pUndoState) return;
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	m_pUndoState->ApplyState(pView->GetPatternEditor());
-	UpdateView(pView->GetDocument());
-}
-
-void CPatternAction::RestoreRedoState(CMainFrame *pMainFrm) const		// // //
-{
-	if (!m_pRedoState) return;
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	m_pRedoState->ApplyState(pView->GetPatternEditor());
-	UpdateView(pView->GetDocument());
-}
-
-void CPatternAction::Undo(CMainFrame *pMainFrm) const
-{
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	CFamiTrackerDoc *pDoc = pView->GetDocument();
-	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
-
-	switch (m_iAction) {
-		case ACT_EDIT_PASTE:		// // //
-			pPatternEditor->SetSelection(m_newSelection);		// // //
-			pPatternEditor->PasteRaw(m_pUndoClipData);
-			break;
-		case ACT_DRAG_AND_DROP:
-			pPatternEditor->SetSelection(m_newSelection);
-			pPatternEditor->PasteRaw(m_pUndoClipData);
-			if (m_bDragDelete)
-				pPatternEditor->PasteRaw(m_pAuxiliaryClipData, m_selection.GetNormalized().m_cpStart);
-			break;
-#ifdef _DEBUG
-		default:
-			AfxMessageBox(_T("TODO Undo for this action is not implemented"));
-#endif
-	}
-}
-
-void CPatternAction::Redo(CMainFrame *pMainFrm) const
-{
-	CFamiTrackerView *pView = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView());
-	CFamiTrackerDoc *pDoc = pView->GetDocument();
-	CPatternEditor *pPatternEditor = pView->GetPatternEditor();
-
-	switch (m_iAction) {
-		case ACT_EDIT_PASTE:
-			pPatternEditor->Paste(m_pClipData, m_iPasteMode, m_iPastePos);		// // //
-			break;		// // //
-		case ACT_DRAG_AND_DROP:
-			pPatternEditor->SetSelection(m_selection);
-			if (m_bDragDelete)
-				DeleteSelection(pMainFrm, m_selection);		// // //
-			pPatternEditor->DragPaste(m_pClipData, &m_dragTarget, m_bDragMix);
-			break;
-#ifdef _DEBUG
-		default:
-			AfxMessageBox(_T("TODO: Redo for this action is not implemented"));
-#endif
-	}
-}
-
+// };
 
 
 CPSelectionAction::CPSelectionAction(int iAction) :
@@ -412,7 +424,6 @@ void CPSelectionAction::Undo(CMainFrame *pMainFrm) const
 	CPatternEditor *pPatternEditor = static_cast<CFamiTrackerView*>(pMainFrm->GetActiveView())->GetPatternEditor();
 	pPatternEditor->PasteRaw(m_pUndoClipData, m_pUndoState->Selection.m_cpStart);
 }
-
 
 
 // // // built-in pattern action subtypes

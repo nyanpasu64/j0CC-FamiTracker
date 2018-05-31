@@ -4115,7 +4115,7 @@ bool CPatternEditor::PerformDrop(const CPatternClipData *pClipData, bool bCopy, 
 
 	m_bSelecting = true;
 
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_DRAG_AND_DROP);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_DRAG_AND_DROP);
 	pAction->SetDragAndDrop(pClipData, bDelete, bMix, &m_selDrag);
 	GetMainFrame()->AddAction(pAction);
 

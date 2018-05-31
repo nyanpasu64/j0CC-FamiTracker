@@ -108,28 +108,20 @@ public:
 	CPatternAction(int iAction);
 
 public:
-	virtual ~CPatternAction();
+	~CPatternAction();
 
-	virtual bool SaveState(const CMainFrame *pMainFrm);
-	virtual void Undo(CMainFrame *pMainFrm) const;
-	virtual void Redo(CMainFrame *pMainFrm) const;
-
-	void SaveUndoState(const CMainFrame *pMainFrm);		// // //
-	void SaveRedoState(const CMainFrame *pMainFrm);		// // //
-	void RestoreUndoState(CMainFrame *pMainFrm) const;		// // //
-	void RestoreRedoState(CMainFrame *pMainFrm) const;		// // //
-
-public:
-	void SetPaste(CPatternClipData *pClipData);
-	void SetPasteMode(paste_mode_t Mode);		// // //
-	void SetPastePos(paste_pos_t Pos);		// // //
-	void SetDragAndDrop(const CPatternClipData *pClipData, bool bDelete, bool bMix, const CSelection *pDragTarget);
+	void SaveUndoState(const CMainFrame *pMainFrm) final;		// // //
+	void SaveRedoState(const CMainFrame *pMainFrm) final;		// // //
+	void RestoreUndoState(CMainFrame *pMainFrm) const final;		// // //
+	void RestoreRedoState(CMainFrame *pMainFrm) const final;		// // //
 
 private:
 	virtual void UpdateView(CFamiTrackerDoc *pDoc) const;		// // //
 
 protected:
-	std::optional<CSelection> SetTargetSelection(CPatternEditor * pPatternEditor);
+	bool m_bSelecting;
+	CSelection m_selection, m_newSelection;		// // //
+
 	void DeleteSelection(CMainFrame *pMainFrm, const CSelection &Sel) const;		// // //
 	bool ValidateSelection(const CMainFrame *pMainFrm) const;		// // //
 	std::pair<CPatternIterator, CPatternIterator> GetIterators(const CMainFrame *pMainFrm) const;		// // //
@@ -137,20 +129,37 @@ protected:
 protected:
 	CPatternEditorState *m_pUndoState;		// // //
 	CPatternEditorState *m_pRedoState;
+};
+
+
+class PasteAction : public CPatternAction {
+public:
+	PasteAction(int iAction);
+	~PasteAction();
+
+public:
+	bool SaveState(const CMainFrame *pMainFrm) override;
+	void Undo(CMainFrame *pMainFrm) const override;
+	void Redo(CMainFrame *pMainFrm) const override;
+
+	void SetPaste(CPatternClipData *pClipData);
+	void SetPasteMode(paste_mode_t Mode);		// // //
+	void SetPastePos(paste_pos_t Pos);		// // //
+	void SetDragAndDrop(const CPatternClipData *pClipData, bool bDelete, bool bMix, const CSelection *pDragTarget);
 
 private:
+	std::optional<CSelection> SetTargetSelection(CPatternEditor * pPatternEditor);
+
 	const CPatternClipData *m_pClipData;
 	CPatternClipData *m_pUndoClipData, *m_pAuxiliaryClipData;		// // //
 	paste_mode_t m_iPasteMode;		// // //
 	paste_pos_t m_iPastePos;		// // //
-	
-	bool m_bSelecting;
-	CSelection m_selection, m_newSelection;		// // //
 
 	bool m_bDragDelete;
 	bool m_bDragMix;
 	CSelection m_dragTarget;
 };
+
 
 /*!
 	\brief Specialization of the pattern action class for actions operating on a selection without

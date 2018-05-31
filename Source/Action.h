@@ -36,7 +36,7 @@ class CMainFrame;		// // //
 class Action
 {
 public:
-	virtual ~Action();
+	virtual ~Action() = default;
 
 	// // // Save the action-specific state information. This method may reject the action by returning false
 	virtual bool SaveState(const CMainFrame *pMainFrm) = 0;
