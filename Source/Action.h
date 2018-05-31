@@ -37,6 +37,8 @@ class Action
 {
 public:
 	virtual ~Action() = default;
+	Action(const Action&) = delete;
+	Action& operator=(const Action& other) = delete;
 
 	// // // Save the action-specific state information. This method may reject the action by returning false
 	virtual bool SaveState(const CMainFrame *pMainFrm) = 0;
