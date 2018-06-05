@@ -6,6 +6,16 @@ SET(PROJECT j0CC_FamiTracker)
 project(${PROJECT})
 set(CMAKE_CXX_STANDARD 17)
 
+# useless with clion/nmake
+if (MSVC)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+    message(STATUS "CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_C_FLAGS = ${CMAKE_C_FLAGS}")
+endif()
+
+
+
 
 # debug build
 add_definitions(-D_AFXDLL)
