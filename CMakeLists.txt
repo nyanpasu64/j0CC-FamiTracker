@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(j0CC_FamiTracker)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
+add_definitions(-D_AFXDLL)
 
 include_directories(.)
 include_directories(Source)
