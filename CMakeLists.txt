@@ -1,4 +1,4 @@
-# TODO: Look at https://github.com/Kitware/CMake/tree/master/Tests/MFC to fix release builds
+# TODO: https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
 cmake_minimum_required(VERSION 3.10)
 project(j0CC_FamiTracker)
@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 # MFC debug/release
-include(mfc.cmake)
+include(cmake/mfc.cmake)
 
 
 # compiling
-include(exe.cmake)
+include(cmake/exe.cmake)
 
 
 # linking
