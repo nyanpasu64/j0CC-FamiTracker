@@ -4,7 +4,6 @@ include_directories(Source)
 add_executable(${PROJECT}
         WIN32
 
-        res/0CC-FamiTracker.manifest
         res/0CC-FamiTracker.rc2
         res/About.bmp
         res/Application.ico
