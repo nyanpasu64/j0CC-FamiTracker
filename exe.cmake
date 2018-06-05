@@ -1,16 +1,5 @@
 include_directories(.)
 include_directories(Source)
-include_directories(Source/APU)
-include_directories(Source/Blip_Buffer)
-include_directories(Source/drivers)
-include_directories(Source/FFT)
-include_directories(Source/json)
-include_directories(Source/resampler)
-include_directories(Source/str_conv)
-include_directories(Source/type_safe)
-include_directories(Source/type_safe/detail)
-include_directories(Source/utils)
-include_directories(Source/WinSDK)
 
 add_executable(${PROJECT}
         WIN32
