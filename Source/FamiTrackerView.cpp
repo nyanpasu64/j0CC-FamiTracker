@@ -3143,8 +3143,15 @@ void CFamiTrackerView::HandleKeyboardInput(Input input)
 				m_pPatternEditor->MoveLeft();
 			if (bMoveRight)
 				m_pPatternEditor->MoveRight();
-			if (bStepDown)
-				StepDown();
+			if (bStepDown) {
+				// FIXME option
+				if (true && Column >= C_EFF1_NUM && Column <= C_EFF1_PARAM2) {
+					m_pPatternEditor->MoveRight();
+				} // else if (something && Column == C_EFF1_PARAM2) {}
+				else {
+					StepDown();
+				}
+			}
 			InvalidateCursor();
 			pAction->SaveRedoState(static_cast<CMainFrame*>(GetParentFrame()));		// // //
 		}
