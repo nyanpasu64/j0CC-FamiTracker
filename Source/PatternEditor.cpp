@@ -2010,7 +2010,7 @@ void CPatternEditor::DrawRegisters(CDC *pDC)
 					(pSoundGen->GetReg(SNDCHIP_S5B, 7) & (8 << i)) ? _T('-') : _T('N'),
 					(pSoundGen->GetReg(SNDCHIP_S5B, 8 + i) & 0x10) ? _T('E') : _T('-'));
 			else
-				text.Format(_T("period = $%02X"), reg[0] & 0x1F);
+				text.Format(_T("pitch = $%02X"), reg[0] & 0x1F);
 			DrawTextFunc(180, text);
 
 			if (i < 3)
