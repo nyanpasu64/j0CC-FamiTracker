@@ -1377,8 +1377,20 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		// This occurs when loading missing/corrupted (improperly uninstalled) fonts.
 	}
 
-#define BARLENGTH (m_iRowHeight > 6 ? 4 : 2)		// // //
-#define BAR(x, y) pDC->FillSolidRect((x) + m_iCharWidth / 2 - BARLENGTH / 2, (y) - m_iRowHeight / 2 + m_iRowHeight / 8, BARLENGTH, 1, pColorInfo->Shaded)
+	// Compute vertical position for empty bars
+	const int halfX = m_iCharWidth / 2;
+	const int halfY = m_iRowHeight - m_iRowHeight / 2;
+
+	const int BAR_WIDTH = m_iRowHeight * 1 / 3;
+	const int BAR_HEIGHT = std::max(m_iRowHeight / 12, 1);
+	auto BAR = [&](int x) {
+		pDC->FillSolidRect(
+				x + halfX - BAR_WIDTH / 2,
+				halfY - BAR_HEIGHT / 2,
+				BAR_WIDTH,
+				BAR_HEIGHT,
+				pColorInfo->Shaded);
+	};
 
 	pDC->SetTextAlign(TA_CENTER | TA_BASELINE);		// // //
 
@@ -1416,14 +1428,14 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 							}
 							if (Found) break;
 						}
-						BAR(PosX, PosY);
-						BAR(PosX + m_iCharWidth, PosY);
-						BAR(PosX + m_iCharWidth * 2, PosY);
+						BAR(PosX);
+						BAR(PosX + m_iCharWidth);
+						BAR(PosX + m_iCharWidth * 2);
 					}
 					else {
-						BAR(PosX, PosY);
-						BAR(PosX + m_iCharWidth, PosY);
-						BAR(PosX + m_iCharWidth * 2, PosY);
+						BAR(PosX);
+						BAR(PosX + m_iCharWidth);
+						BAR(PosX + m_iCharWidth * 2);
 					}
 					break;		// // // same below
 				case HALT:
@@ -1460,7 +1472,7 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		case C_INSTRUMENT1:
 			// Instrument x0
 			if (pNoteData->Instrument == MAX_INSTRUMENTS || pNoteData->Note == HALT || pNoteData->Note == RELEASE)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else if (pNoteData->Instrument == HOLD_INSTRUMENT)		// // // 050B
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, '&', InstColor);
 			else
@@ -1469,7 +1481,7 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		case C_INSTRUMENT2:
 			// Instrument 0x
 			if (pNoteData->Instrument == MAX_INSTRUMENTS || pNoteData->Note == HALT || pNoteData->Note == RELEASE)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else if (pNoteData->Instrument == HOLD_INSTRUMENT)		// // // 050B
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, '&', InstColor);
 			else
@@ -1478,28 +1490,28 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		case C_VOLUME: 
 			// Volume
 			if (pNoteData->Vol == MAX_VOLUME || pTrackerChannel->GetID() == CHANID_DPCM)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else 
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, HEX[pNoteData->Vol & 0x0F], pColorInfo->Volume);		// // //
 			break;
 		case C_EFF1_NUM: case C_EFF2_NUM: case C_EFF3_NUM: case C_EFF4_NUM:
 			// Effect type
 			if (EffNumber == 0)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, EFF_CHAR[EffNumber], EffColor);		// // //
 			break;
 		case C_EFF1_PARAM1: case C_EFF2_PARAM1: case C_EFF3_PARAM1: case C_EFF4_PARAM1:
 			// Effect param x
 			if (EffNumber == 0)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, HEX[(EffParam >> 4) & 0x0F], pColorInfo->Note);		// // //
 			break;
 		case C_EFF1_PARAM2: case C_EFF2_PARAM2: case C_EFF3_PARAM2: case C_EFF4_PARAM2:
 			// Effect param y
 			if (EffNumber == 0)
-				BAR(PosX, PosY);
+				BAR(PosX);
 			else
 				DrawChar(pDC, PosX + m_iCharWidth / 2, PosY, HEX[EffParam & 0x0F], pColorInfo->Note);		// // //
 			break;
