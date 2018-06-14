@@ -85,12 +85,6 @@ CConfigAppearance::~CConfigAppearance()
 {
 }
 
-void CConfigAppearance::DoDataExchange(CDataExchange* pDX)
-{
-	CPropertyPage::DoDataExchange(pDX);
-}
-
-
 BEGIN_MESSAGE_MAP(CConfigAppearance, CPropertyPage)
 	ON_WM_PAINT()
 	ON_CBN_SELCHANGE(IDC_FONT, OnCbnSelchangeFont)

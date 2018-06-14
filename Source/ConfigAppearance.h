@@ -72,8 +72,6 @@ protected:
 	static const char HEX_PREFIX[];		// // // 050B
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
 	void SelectColorScheme(const COLOR_SCHEME *pColorScheme);
 
 	void SetColor(int Index, int Color);
