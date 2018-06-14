@@ -250,21 +250,26 @@ void CPatternEditor::ApplyColorScheme()
 {
 	// The color scheme has changed
 	//
-
-	const CSettings *pSettings = theApp.GetSettings();
+	const CSettings *settings = theApp.GetSettings();
 
 	LOGFONT LogFont;
-	LPCTSTR	FontName = pSettings->Appearance.strFont;		// // //
-	LPCTSTR	HeaderFace = DEFAULT_HEADER_FONT;
+	LPCTSTR FontName = settings->Appearance.strFont;		// // //
+	LPCTSTR HeaderFace = DEFAULT_HEADER_FONT;
 
-	COLORREF ColBackground = pSettings->Appearance.iColBackground;
+	COLORREF ColBackground = settings->Appearance.iColBackground;
 
-	// Fetch font size
-	m_iPatternFontSize = pSettings->Appearance.iFontSize;		// // //
-	m_iCharWidth = m_iPatternFontSize - 1;
-	m_iColumnSpacing = (m_iPatternFontSize + 1) / 3;
+	// Font size
+	const int fontSize = settings->Appearance.fontSize;
+	m_iPatternFontSize = fontSize;
+
+	// Grid size
+	// FIXME
+//	const int rowHeight = settings->Appearance.rowHeight;
+	const int rowHeight = settings->Appearance.fontSize;
+	m_iRowHeight = rowHeight;
+	m_iCharWidth = rowHeight - 1;
+	m_iColumnSpacing = (rowHeight + 1) / 3;
 	m_iRowColumnWidth = m_iCharWidth * 3 + 2;
-	m_iRowHeight = m_iPatternFontSize;
 
 	CalcLayout();
 

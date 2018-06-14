@@ -186,7 +186,9 @@ public:
 
 		CString	strFont;		// // //
 		CString	strFrameFont;		// // // 050B
-		int		iFontSize;
+		int		fontSize;
+		int		rowHeight;
+
 		bool	bPatternColor;
 		bool	bDisplayFlats;
 	} Appearance;
