@@ -1370,16 +1370,25 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		DimEff = EffColor = RGB(255, 0, 0);		// // //
 
 	// Compute font vertical position
-	// TODO resize font about center = avg(cap, base + descender/2)?
-
 	int PosY = m_iRowHeight;
-	PosY -= PosY / HEIGHT_OFFSET;
 
 	TEXTMETRIC textMetrics;
 	if (GetTextMetrics(*pDC, &textMetrics)) {
 		// TODO speed hit?
-		PosY -= textMetrics.tmDescent / DESCENDER_OFFSET;	// to accomodate the tail of Q
+		int capHeight = m_iPatternFontSize;
+		capHeight -= capHeight / 4;
+
+		int descendHeight = textMetrics.tmDescent;
+		descendHeight -= descendHeight / 2;
+
+		// Δ is the distance from bottom to baseline.
+		// row - Δ - cap = Δ - desc
+		// Δ = (row + desc - cap) / 2
+
+		int delta = (m_iRowHeight + descendHeight - capHeight) / 2;
+		PosY -= delta;
 	} else {
+		PosY -= PosY / 8;
 		// This occurs when loading missing/corrupted (improperly uninstalled) fonts.
 	}
 
