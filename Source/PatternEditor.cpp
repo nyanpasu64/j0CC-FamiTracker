@@ -279,7 +279,6 @@ void CPatternEditor::ApplyColorScheme()
 	memcpy(LogFont.lfFaceName, FontName, _tcslen(FontName));
 
 	LogFont.lfHeight = -m_iPatternFontSize;
-//	LogFont.lfHeight = -DPI::SY(12);		// // //
 	LogFont.lfQuality = DRAFT_QUALITY;
 	LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
@@ -1367,8 +1366,16 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 	if (EffNumber != EF_NONE) if (!pTrackerChannel->IsEffectCompatible(EffNumber, EffParam))
 		DimEff = EffColor = RGB(255, 0, 0);		// // //
 
-	int PosY = m_iRowHeight - m_iRowHeight / 8;		// // //
-	// // // PosX -= 1;
+	// Compute font vertical position
+	int PosY = m_iRowHeight;
+	PosY -= PosY / 8;
+
+	TEXTMETRIC textMetrics;
+	if (GetTextMetrics(*pDC, &textMetrics)) {
+		PosY -= textMetrics.tmDescent / 2;	// to accomodate the tail of Q
+	} else {
+		// This occurs when loading missing/corrupted (improperly uninstalled) fonts.
+	}
 
 #define BARLENGTH (m_iRowHeight > 6 ? 4 : 2)		// // //
 #define BAR(x, y) pDC->FillSolidRect((x) + m_iCharWidth / 2 - BARLENGTH / 2, (y) - m_iRowHeight / 2 + m_iRowHeight / 8, BARLENGTH, 1, pColorInfo->Shaded)
