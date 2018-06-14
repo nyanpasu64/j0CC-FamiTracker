@@ -246,6 +246,8 @@ CPatternEditor::~CPatternEditor()
 
 // Drawing
 
+const int PERCENT = 100;
+
 void CPatternEditor::ApplyColorScheme()
 {
 	// The color scheme has changed
@@ -258,18 +260,17 @@ void CPatternEditor::ApplyColorScheme()
 
 	COLORREF ColBackground = settings->Appearance.iColBackground;
 
-	// Font size
-	const int fontSize = settings->Appearance.fontSize;
-	m_iPatternFontSize = fontSize;
-
 	// Grid size
 	// FIXME
-//	const int rowHeight = settings->Appearance.rowHeight;
-	const int rowHeight = settings->Appearance.fontSize;
+	const int rowHeight = settings->Appearance.rowHeight;
 	m_iRowHeight = rowHeight;
 	m_iCharWidth = rowHeight - 1;
 	m_iColumnSpacing = (rowHeight + 1) / 3;
 	m_iRowColumnWidth = m_iCharWidth * 3 + 2;
+
+	// Font size (rounded to nearest pixel)
+	const int fontSize = (rowHeight * settings->Appearance.fontPercent + PERCENT / 2) / PERCENT;
+	m_iPatternFontSize = fontSize;
 
 	CalcLayout();
 

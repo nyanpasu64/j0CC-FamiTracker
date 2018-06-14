@@ -26,6 +26,7 @@
 // Default font
 const static TCHAR *FONT_FACE = _T("Verdana");
 const static int FONT_SIZE	  = 12;
+const static int FONT_RATIO = 100;
 
 // Static colors
 const struct {

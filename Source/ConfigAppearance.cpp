@@ -274,7 +274,7 @@ BOOL CConfigAppearance::OnInitDialog()
 	m_iColors[COL_CURRENT_ROW_EDIT]		= pSettings->Appearance.iColCurrentRowEdit;
 	m_iColors[COL_CURRENT_ROW_PLAYING]	= pSettings->Appearance.iColCurrentRowPlaying;
 
-	m_iFontSize	= pSettings->Appearance.iFontSize;		// // //
+	m_iFontSize	= pSettings->Appearance.rowHeight;		// // //
 
 	m_bPatternColors = pSettings->Appearance.bPatternColor;		// // //
 	m_bDisplayFlats = pSettings->Appearance.bDisplayFlats;		// // //
@@ -313,7 +313,7 @@ BOOL CConfigAppearance::OnApply()
 	CSettings *pSettings = theApp.GetSettings();
 
 	pSettings->Appearance.strFont	 = m_strFont;		// // //
-	pSettings->Appearance.iFontSize	 = m_iFontSize;		// // //
+	pSettings->Appearance.rowHeight	 = m_iFontSize;		// // //
 	pSettings->Appearance.bPatternColor = m_bPatternColors;		// // //
 	pSettings->Appearance.bDisplayFlats = m_bDisplayFlats;		// // //
 
