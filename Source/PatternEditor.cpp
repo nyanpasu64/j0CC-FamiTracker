@@ -1313,6 +1313,9 @@ void CPatternEditor::DrawRow(CDC *pDC, int Row, int Line, int Frame, bool bPrevi
 	}
 }
 
+static const int HEIGHT_OFFSET = 8;
+static const int DESCENDER_OFFSET = 2;
+
 void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Channel, bool bInvert, stChanNote *pNoteData, RowColorInfo_t *pColorInfo) const
 {
 	// Sharps
@@ -1367,12 +1370,15 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 		DimEff = EffColor = RGB(255, 0, 0);		// // //
 
 	// Compute font vertical position
+	// TODO resize font about center = avg(cap, base + descender/2)?
+
 	int PosY = m_iRowHeight;
-	PosY -= PosY / 8;
+	PosY -= PosY / HEIGHT_OFFSET;
 
 	TEXTMETRIC textMetrics;
 	if (GetTextMetrics(*pDC, &textMetrics)) {
-		PosY -= textMetrics.tmDescent / 2;	// to accomodate the tail of Q
+		// TODO speed hit?
+		PosY -= textMetrics.tmDescent / DESCENDER_OFFSET;	// to accomodate the tail of Q
 	} else {
 		// This occurs when loading missing/corrupted (improperly uninstalled) fonts.
 	}
