@@ -642,7 +642,7 @@ BOOL CFamiTrackerDoc::SaveDocument(LPCTSTR lpszPathName) const
 	CDocumentFile DocumentFile;
 	m_pCurrentDocument = &DocumentFile;		// // //
 	CFileException ex;
-	TCHAR TempFile[MAX_PATH];
+	TCHAR TempPath[MAX_PATH], TempFile[MAX_PATH];
 
 	// First write to a temp file (if saving fails, the original is not destroyed)
 	GetTempPath(MAX_PATH, TempPath);
