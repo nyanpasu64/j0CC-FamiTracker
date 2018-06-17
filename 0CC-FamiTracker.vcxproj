@@ -216,6 +216,7 @@
     <ClCompile Include="Source\StretchDlg.cpp" />
     <ClCompile Include="Source\SwapDlg.cpp" />
     <ClCompile Include="Source\TransposeDlg.cpp" />
+    <ClCompile Include="Source\utils\ftmath.cpp" />
     <ClCompile Include="Source\VisualizerBase.cpp" />
     <ClCompile Include="Source\WaveEditor.cpp" />
     <ClCompile Include="Source\GraphEditor.cpp" />
@@ -323,7 +324,6 @@
     <ClInclude Include="Source\FrameEditorTypes.h" />
     <ClInclude Include="Source\IntRange.h" />
     <ClInclude Include="Source\NoteQueue.h" />
-    <ClInclude Include="Source\NumConv.h" />
     <ClInclude Include="Source\PatternComponent.h" />
     <ClInclude Include="Source\RegisterState.h" />
     <ClInclude Include="Source\CompoundAction.h" />
@@ -427,6 +427,7 @@
     <ClInclude Include="Source\type_safe\types.hpp" />
     <ClInclude Include="Source\type_safe\variant.hpp" />
     <ClInclude Include="Source\type_safe\visitor.hpp" />
+    <ClInclude Include="Source\utils\ftmath.h" />
     <ClInclude Include="Source\utils\input.h" />
     <ClInclude Include="Source\VisualizerBase.h" />
     <ClInclude Include="Source\WaveformGenerator.h" />
