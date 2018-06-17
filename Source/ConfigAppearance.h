@@ -83,7 +83,9 @@ protected:
 protected:
 	CString		m_strFont;
 	
-	int			m_iFontSize;
+	int			m_rowHeight;
+	int			fontPercent;
+	
 	int			m_iSelectedItem;
 	bool		m_bPatternColors;
 	bool		m_bDisplayFlats;

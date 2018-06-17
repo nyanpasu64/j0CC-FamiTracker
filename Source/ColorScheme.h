@@ -70,6 +70,7 @@ struct COLOR_SCHEME {
 	const COLORREF	ROW_PLAYING;		// // //
 	const TCHAR		*FONT_FACE;
 	const int		FONT_SIZE;
+	const int FONT_PERCENT = 100;
 };
 
 // Default

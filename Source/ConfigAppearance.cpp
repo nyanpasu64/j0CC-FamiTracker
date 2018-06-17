@@ -64,6 +64,8 @@ const int CConfigAppearance::NUM_COLOR_SCHEMES = sizeof(COLOR_SCHEMES) / sizeof(
 const int CConfigAppearance::FONT_SIZES[] = {10, 11, 12, 14, 16, 18, 20, 22};
 const int CConfigAppearance::FONT_SIZE_COUNT = sizeof(FONT_SIZES) / sizeof(int);
 
+const int FONT_PERCENTAGES[] = {80, 90, 100, 110, 120};
+
 int CALLBACK CConfigAppearance::EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD FontType, LPARAM lParam)
 {
 	if (lpelfe->elfLogFont.lfCharSet == ANSI_CHARSET && lpelfe->elfFullName[0] != '@' &&
@@ -145,7 +147,7 @@ void CConfigAppearance::OnPaint()
 	memset(&LogFont, 0, sizeof(LOGFONT));
 	strcpy_s(LogFont.lfFaceName, LF_FACESIZE, m_strFont.GetBuffer());
 
-	LogFont.lfHeight = -m_iFontSize;
+	LogFont.lfHeight = -m_rowHeight * this->fontPercent;	// FIXME
 	LogFont.lfPitchAndFamily = VARIABLE_PITCH | FF_SWISS;
 
 	Font.CreateFontIndirect(&LogFont);
@@ -159,7 +161,7 @@ void CConfigAppearance::OnPaint()
 	COLORREF ShadedCol = DIM(GetColor(COL_PATTERN_TEXT), 50);
 	COLORREF ShadedHiCol = DIM(GetColor(COL_PATTERN_TEXT_HILITE), 50);
 
-	int iRowSize = m_iFontSize;
+	int iRowSize = m_rowHeight;
 	int iRows = (WinHeight - 12) / iRowSize;// 12;
 
 	COLORREF CursorCol = GetColor(COL_CURSOR);
@@ -243,7 +245,10 @@ BOOL CConfigAppearance::OnInitDialog()
 
 	CComboBox *pFontList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT));
 	CComboBox *pFontSizeList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE));
+	CComboBox *fontPercentList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT_RATIO));
 	CComboBox *pItemsBox = static_cast<CComboBox*>(GetDlgItem(IDC_COL_ITEM));
+	// somebody please cleanse this with fire.
+	// Use MFC "subclassing" (mapping this->widget object to IDC).
 
 	for (int i = 0; i < COLOR_ITEM_COUNT; ++i) {
 		pItemsBox->AddString(COLOR_ITEMS[i]);
@@ -268,7 +273,8 @@ BOOL CConfigAppearance::OnInitDialog()
 	m_iColors[COL_CURRENT_ROW_EDIT]		= pSettings->Appearance.iColCurrentRowEdit;
 	m_iColors[COL_CURRENT_ROW_PLAYING]	= pSettings->Appearance.iColCurrentRowPlaying;
 
-	m_iFontSize	= pSettings->Appearance.rowHeight;		// // //
+	m_rowHeight	= pSettings->Appearance.rowHeight;		// // //
+	this->fontPercent = pSettings->Appearance.fontPercent;
 
 	m_bPatternColors = pSettings->Appearance.bPatternColor;		// // //
 	m_bDisplayFlats = pSettings->Appearance.bDisplayFlats;		// // //
@@ -285,12 +291,24 @@ BOOL CConfigAppearance::OnInitDialog()
 		_itot_s(FONT_SIZES[i], txtBuf, 16, 10);
 		pFontSizeList->AddString(txtBuf);
 	}		// // //
-	_itot_s(m_iFontSize, txtBuf, 16, 10);
+	_itot_s(m_rowHeight, txtBuf, 16, 10);
 	pFontSizeList->SetWindowText(txtBuf);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	// EXCEPTION: OCX Property Pages should return FALSE
+
+	// Convert font percentages into strings
+	CString percentStr;
+
+	for (int percent : FONT_PERCENTAGES) {
+		percentStr.Format(_T("%d"), percent);
+		fontPercentList->AddString(percentStr);
+	}
+	percentStr.Format(_T("%d"), this->fontPercent);
+	fontPercentList->SetWindowText(percentStr);
+
+
+	return TRUE;  // FALSE if you set the focus to a control
 }
+
 
 void CConfigAppearance::AddFontName(char *Name)
 {
@@ -307,7 +325,9 @@ BOOL CConfigAppearance::OnApply()
 	CSettings *pSettings = theApp.GetSettings();
 
 	pSettings->Appearance.strFont	 = m_strFont;		// // //
-	pSettings->Appearance.rowHeight	 = m_iFontSize;		// // //
+	pSettings->Appearance.rowHeight	 = m_rowHeight;		// // //
+	pSettings->Appearance.fontPercent = this->fontPercent;
+
 	pSettings->Appearance.bPatternColor = m_bPatternColors;		// // //
 	pSettings->Appearance.bDisplayFlats = m_bDisplayFlats;		// // //
 
@@ -398,9 +418,10 @@ void CConfigAppearance::SelectColorScheme(const COLOR_SCHEME *pColorScheme)
 	SetColor(COL_CURRENT_ROW_PLAYING, pColorScheme->ROW_PLAYING);
 
 	m_strFont = pColorScheme->FONT_FACE;
-	m_iFontSize = pColorScheme->FONT_SIZE;
+	m_rowHeight = pColorScheme->FONT_SIZE;
+	this->fontPercent = pColorScheme->FONT_PERCENT;
 	pFontList->SelectString(0, m_strFont);
-	pFontSizeList->SelectString(0, MakeIntString(m_iFontSize));
+	pFontSizeList->SelectString(0, MakeIntString(m_rowHeight));
 }
 
 void CConfigAppearance::SetColor(int Index, int Color)
@@ -418,7 +439,7 @@ void CConfigAppearance::OnCbnSelchangeFontSize()
 	CString str;
 	CComboBox *pFontSizeList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE));
 	pFontSizeList->GetLBText(pFontSizeList->GetCurSel(), str);
-	m_iFontSize = _ttoi(str);
+	m_rowHeight = _ttoi(str);
 	RedrawWindow();
 	SetModified();
 }
@@ -430,7 +451,7 @@ void CConfigAppearance::OnCbnEditchangeFontSize()		// // //
 	pFontSizeList->GetWindowText(str);
 	int newSize = _ttoi(str);
 	if (newSize < 5 || newSize > 30) return; // arbitrary
-	m_iFontSize = newSize;
+	m_rowHeight = newSize;
 	RedrawWindow();
 	SetModified();
 }
@@ -462,7 +483,7 @@ void CConfigAppearance::OnBnClickedButtonAppearanceLoad()		// // // 050B
 	if (fileDialog.DoModal() == IDOK) {
 		ImportSettings(fileDialog.GetPathName().GetBuffer());
 		static_cast<CComboBox*>(GetDlgItem(IDC_FONT))->SelectString(0, m_strFont);
-		static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE))->SelectString(0, MakeIntString(m_iFontSize));
+		static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE))->SelectString(0, MakeIntString(m_rowHeight));
 		RedrawWindow();
 		SetModified();
 	}
@@ -477,7 +498,7 @@ void CConfigAppearance::ExportSettings(const char *Path) const		// // // 050B
 		file << "Pattern colors" << SETTING_SEPARATOR << m_bPatternColors << std::endl;
 		file << "Flags" << SETTING_SEPARATOR << m_bDisplayFlats << std::endl;
 		file << "Font" << SETTING_SEPARATOR << m_strFont << std::endl;
-		file << "Font size" << SETTING_SEPARATOR << m_iFontSize << std::endl;
+		file << "Font size" << SETTING_SEPARATOR << m_rowHeight << std::endl;
 	}
 }
 
@@ -514,7 +535,7 @@ void CConfigAppearance::ImportSettings(const char *Path)		// // // 050B
 		}
 		else if (Line.find("Font size") != std::string::npos) {
 			if (auto x = conv::to_uint(sv))
-				m_iFontSize = *x;
+				m_rowHeight = *x;
 		}
 		else if (Line.find("Font") != std::string::npos)
 			m_strFont = sv.data();
