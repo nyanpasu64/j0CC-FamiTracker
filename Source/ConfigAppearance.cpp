@@ -296,13 +296,16 @@ BOOL CConfigAppearance::OnInitDialog()
 	m_bPatternColors = pSettings->Appearance.bPatternColor;		// // //
 	m_bDisplayFlats = pSettings->Appearance.bDisplayFlats;		// // //
 
+	
+	// Load color schemes
 	pItemsBox = static_cast<CComboBox*>(GetDlgItem(IDC_SCHEME));
 
 	for (int i = 0; i < NUM_COLOR_SCHEMES; ++i) {
 		pItemsBox->AddString(COLOR_SCHEMES[i]->NAME);
 	}
 
-	// Convert font sizes to strings
+
+	// Load font sizes
 	TCHAR txtBuf[16];
 
 	for (int i = 0; i < FONT_SIZE_COUNT; ++i) {
@@ -310,10 +313,12 @@ BOOL CConfigAppearance::OnInitDialog()
 		pFontSizeList->AddString(txtBuf);
 	}		// // //
 	_itot_s(m_rowHeight, txtBuf, 16, 10);
+	pFontSizeList->SelectString(0, txtBuf);
 	pFontSizeList->SetWindowText(txtBuf);
+	
 
 
-	// Convert font percentages into strings
+	// Load font percentages
 	CString percentStr;
 
 	for (int percent : FONT_PERCENTAGES) {
@@ -321,6 +326,7 @@ BOOL CConfigAppearance::OnInitDialog()
 		fontPercentList.AddString(percentStr);
 	}
 	percentStr.Format(_T("%d"), this->fontPercent);
+	fontPercentList.SelectString(0, percentStr);
 	fontPercentList.SetWindowText(percentStr);
 
 
