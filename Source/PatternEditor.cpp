@@ -248,6 +248,12 @@ CPatternEditor::~CPatternEditor()
 
 const int PERCENT = 100;
 
+
+int calculateFontSize(const int rowHeight, const int fontPercent) {
+	return (rowHeight * fontPercent + PERCENT / 2) / PERCENT;
+}
+
+
 void CPatternEditor::ApplyColorScheme()
 {
 	// The color scheme has changed
@@ -269,7 +275,8 @@ void CPatternEditor::ApplyColorScheme()
 	m_iRowColumnWidth = m_iCharWidth * 3 + 2;
 
 	// Font size (rounded to nearest pixel)
-	const int fontSize = (rowHeight * settings->Appearance.fontPercent + PERCENT / 2) / PERCENT;
+	const int fontSize = calculateFontSize(rowHeight, settings->Appearance.fontPercent);
+
 	m_iPatternFontSize = fontSize;
 
 	CalcLayout();
