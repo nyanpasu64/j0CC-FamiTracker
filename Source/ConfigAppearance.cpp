@@ -264,8 +264,12 @@ BOOL CConfigAppearance::OnInitDialog()
 	this->fontPercentList.SubclassDlgItem(IDC_FONT_PERCENT, this);
 	CComboBox *pItemsBox = static_cast<CComboBox*>(GetDlgItem(IDC_COL_ITEM));
 	
-	// somebody please cleanse this with fire.
-	// Use MFC "subclassing" (mapping this->widget object to IDC).
+	// Select font.
+	// (Cannot perform in AddFontName, since fonts are processed
+	// non-sequentially, and assigning selection focus midway through is wrong.)
+	pFontList->SelectString(0, m_strFont);
+
+	// Color types
 
 	for (int i = 0; i < COLOR_ITEM_COUNT; ++i) {
 		pItemsBox->AddString(COLOR_ITEMS[i]);
@@ -339,9 +343,6 @@ void CConfigAppearance::AddFontName(char *Name)
 	CComboBox *pFontList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT));
 
 	pFontList->AddString(Name);
-
-	if (m_strFont.Compare(Name) == 0)
-		pFontList->SelectString(0, Name);
 }
 
 BOOL CConfigAppearance::OnApply()
