@@ -24,11 +24,11 @@
 #include "FamiTracker.h"
 #include "ConfigAppearance.h"
 #include "Settings.h"
-#include "ColorScheme.h"
 #include "Graphics.h"
 #include <fstream>
 #include <string>
 #include "NumConv.h"		// // //
+#include "utils/ftmath.h"
 
 const TCHAR *CConfigAppearance::COLOR_ITEMS[] = {
 	_T("Background"), 
@@ -89,14 +89,25 @@ CConfigAppearance::~CConfigAppearance()
 
 BEGIN_MESSAGE_MAP(CConfigAppearance, CPropertyPage)
 	ON_WM_PAINT()
-	ON_CBN_SELCHANGE(IDC_FONT, OnCbnSelchangeFont)
-	ON_BN_CLICKED(IDC_PICK_COL, OnBnClickedPickCol)
-	ON_CBN_SELCHANGE(IDC_COL_ITEM, OnCbnSelchangeColItem)
+	
 	ON_CBN_SELCHANGE(IDC_SCHEME, OnCbnSelchangeScheme)
-	ON_CBN_SELCHANGE(IDC_FONT_SIZE, OnCbnSelchangeFontSize)
+	
+	ON_CBN_SELCHANGE(IDC_COL_ITEM, OnCbnSelchangeColItem)
+
+	ON_BN_CLICKED(IDC_PICK_COL, OnBnClickedPickCol)
+	
 	ON_BN_CLICKED(IDC_PATTERNCOLORS, OnBnClickedPatterncolors)
+
 	ON_BN_CLICKED(IDC_DISPLAYFLATS, OnBnClickedDisplayFlats)
+
+	ON_CBN_SELCHANGE(IDC_FONT, OnCbnSelchangeFont)
+	
+	ON_CBN_SELCHANGE(IDC_FONT_SIZE, OnCbnSelchangeFontSize)
 	ON_CBN_EDITCHANGE(IDC_FONT_SIZE, OnCbnEditchangeFontSize)
+
+	ON_CBN_SELCHANGE(IDC_FONT_PERCENT, OnCbnSelchangeFontPercent)
+	ON_CBN_EDITCHANGE(IDC_FONT_PERCENT, OnCbnEditchangeFontPercent)
+	
 	ON_BN_CLICKED(IDC_BUTTON_APPEARANCE_SAVE, OnBnClickedButtonAppearanceSave)
 	ON_BN_CLICKED(IDC_BUTTON_APPEARANCE_LOAD, OnBnClickedButtonAppearanceLoad)
 END_MESSAGE_MAP()
@@ -128,7 +139,8 @@ void CConfigAppearance::OnPaint()
 	dc.Rectangle(Rect);
 	dc.SelectObject(pOldBrush);
 
-	// Preview all colors
+
+	// **** Pattern row editor preview ****
 
 	pWnd = GetDlgItem(IDC_PREVIEW);
 	pWnd->GetWindowRect(Rect);
@@ -141,20 +153,22 @@ void CConfigAppearance::OnPaint()
 	int WinHeight = Rect.bottom - Rect.top;
 	int WinWidth = Rect.right - Rect.left;
 
+	// Create font
 	CFont Font, *OldFont;
 	LOGFONT LogFont;
 
 	memset(&LogFont, 0, sizeof(LOGFONT));
 	strcpy_s(LogFont.lfFaceName, LF_FACESIZE, m_strFont.GetBuffer());
 
-	LogFont.lfHeight = -m_rowHeight * this->fontPercent;	// FIXME
+	const int fontSize = calculateFontSize(m_rowHeight, this->fontPercent);
+	LogFont.lfHeight = -fontSize;
 	LogFont.lfPitchAndFamily = VARIABLE_PITCH | FF_SWISS;
 
 	Font.CreateFontIndirect(&LogFont);
 
 	OldFont = dc.SelectObject(&Font);
 
-	// Background
+	// Draw background
 	dc.FillSolidRect(Rect, GetColor(COL_BACKGROUND));
 	dc.SetBkMode(TRANSPARENT);
 
@@ -170,6 +184,8 @@ void CConfigAppearance::OnPaint()
 	COLORREF HilightBgCol = GetColor(COL_BACKGROUND_HILITE);
 	COLORREF Hilight2BgCol = GetColor(COL_BACKGROUND_HILITE2);
 
+	// TODO don't use hard-coded increments, disgusting
+	// Use a CPatternEditor object to draw.
 	for (int i = 0; i < iRows; ++i) {
 
 		int OffsetTop = Rect.top + (i * iRowSize) + 6;
@@ -178,8 +194,8 @@ void CConfigAppearance::OnPaint()
 		if (OffsetTop > (Rect.bottom - iRowSize))
 			break;
 
-		if ((i & 3) == 0) {
-			if ((i & 6) == 0)
+		if (i % 4 == 0) {
+			if (i % 8 == 0)
 				GradientBar(&dc, Rect.left, OffsetTop, Rect.right - Rect.left, iRowSize, Hilight2BgCol, BgCol);
 			else
 				GradientBar(&dc, Rect.left, OffsetTop, Rect.right - Rect.left, iRowSize, HilightBgCol, BgCol);
@@ -245,8 +261,9 @@ BOOL CConfigAppearance::OnInitDialog()
 
 	CComboBox *pFontList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT));
 	CComboBox *pFontSizeList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE));
-	CComboBox *fontPercentList = static_cast<CComboBox*>(GetDlgItem(IDC_FONT_RATIO));
+	this->fontPercentList.SubclassDlgItem(IDC_FONT_PERCENT, this);
 	CComboBox *pItemsBox = static_cast<CComboBox*>(GetDlgItem(IDC_COL_ITEM));
+	
 	// somebody please cleanse this with fire.
 	// Use MFC "subclassing" (mapping this->widget object to IDC).
 
@@ -285,6 +302,7 @@ BOOL CConfigAppearance::OnInitDialog()
 		pItemsBox->AddString(COLOR_SCHEMES[i]->NAME);
 	}
 
+	// Convert font sizes to strings
 	TCHAR txtBuf[16];
 
 	for (int i = 0; i < FONT_SIZE_COUNT; ++i) {
@@ -300,10 +318,10 @@ BOOL CConfigAppearance::OnInitDialog()
 
 	for (int percent : FONT_PERCENTAGES) {
 		percentStr.Format(_T("%d"), percent);
-		fontPercentList->AddString(percentStr);
+		fontPercentList.AddString(percentStr);
 	}
 	percentStr.Format(_T("%d"), this->fontPercent);
-	fontPercentList->SetWindowText(percentStr);
+	fontPercentList.SetWindowText(percentStr);
 
 
 	return TRUE;  // FALSE if you set the focus to a control
@@ -418,10 +436,13 @@ void CConfigAppearance::SelectColorScheme(const COLOR_SCHEME *pColorScheme)
 	SetColor(COL_CURRENT_ROW_PLAYING, pColorScheme->ROW_PLAYING);
 
 	m_strFont = pColorScheme->FONT_FACE;
-	m_rowHeight = pColorScheme->FONT_SIZE;
-	this->fontPercent = pColorScheme->FONT_PERCENT;
 	pFontList->SelectString(0, m_strFont);
+	
+	m_rowHeight = pColorScheme->FONT_SIZE;
 	pFontSizeList->SelectString(0, MakeIntString(m_rowHeight));
+	
+	this->fontPercent = pColorScheme->FONT_PERCENT;
+	this->fontPercentList.SelectString(0, MakeIntString(fontPercent));
 }
 
 void CConfigAppearance::SetColor(int Index, int Color)
@@ -456,6 +477,34 @@ void CConfigAppearance::OnCbnEditchangeFontSize()		// // //
 	SetModified();
 }
 
+
+const int MAX_PERCENT = 200;
+
+void CConfigAppearance::OnCbnSelchangeFontPercent() {
+	CString text;
+	this->fontPercentList.GetLBText(fontPercentList.GetCurSel(), text);
+	onChangeFontPercent(text);
+}
+
+void CConfigAppearance::OnCbnEditchangeFontPercent() {
+	CString text;
+	this->fontPercentList.GetWindowText(text);
+	onChangeFontPercent(text);
+}
+
+void CConfigAppearance::onChangeFontPercent(CString text) {
+	auto maybe = parseLong(text);
+	if (!maybe) return;
+
+	long percent = *maybe;
+	if (percent < 0 || percent > MAX_PERCENT) return;
+
+	this->fontPercent = percent;
+	RedrawWindow();
+	SetModified();
+}
+
+
 void CConfigAppearance::OnBnClickedPatterncolors()
 {
 	m_bPatternColors = IsDlgButtonChecked(IDC_PATTERNCOLORS) != 0;
@@ -484,6 +533,7 @@ void CConfigAppearance::OnBnClickedButtonAppearanceLoad()		// // // 050B
 		ImportSettings(fileDialog.GetPathName().GetBuffer());
 		static_cast<CComboBox*>(GetDlgItem(IDC_FONT))->SelectString(0, m_strFont);
 		static_cast<CComboBox*>(GetDlgItem(IDC_FONT_SIZE))->SelectString(0, MakeIntString(m_rowHeight));
+		this->fontPercentList.SelectString(0, MakeIntString(fontPercent));
 		RedrawWindow();
 		SetModified();
 	}
@@ -499,6 +549,7 @@ void CConfigAppearance::ExportSettings(const char *Path) const		// // // 050B
 		file << "Flags" << SETTING_SEPARATOR << m_bDisplayFlats << std::endl;
 		file << "Font" << SETTING_SEPARATOR << m_strFont << std::endl;
 		file << "Font size" << SETTING_SEPARATOR << m_rowHeight << std::endl;
+		file << "Font percent" << SETTING_SEPARATOR << this->fontPercent << std::endl;
 	}
 }
 
@@ -536,6 +587,10 @@ void CConfigAppearance::ImportSettings(const char *Path)		// // // 050B
 		else if (Line.find("Font size") != std::string::npos) {
 			if (auto x = conv::to_uint(sv))
 				m_rowHeight = *x;
+		}
+		else if (Line.find("Font percent")  != std::string::npos) {
+			if (auto x = conv::to_uint(sv))
+				this->fontPercent = *x;
 		}
 		else if (Line.find("Font") != std::string::npos)
 			m_strFont = sv.data();

@@ -596,7 +596,7 @@
 #define IDC_N163_OFFSET_SLIDER          1461
 #define IDC_N163_OFFSET_EDIT            1463
 #define IDC_N163_OFFSET_DB              1464
-#define IDC_FONT_RATIO                  1465
+#define IDC_FONT_PERCENT                1465
 #define IDS_FIND_BEGIN                  9001
 #define IDS_FIND_END                    9002
 #define ID_TRACKER_PLAY                 32771

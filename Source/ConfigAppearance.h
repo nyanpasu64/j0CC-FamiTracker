@@ -85,6 +85,7 @@ protected:
 	
 	int			m_rowHeight;
 	int			fontPercent;
+	CComboBox	fontPercentList;
 	
 	int			m_iSelectedItem;
 	bool		m_bPatternColors;
@@ -106,6 +107,11 @@ public:
 	afx_msg void OnBnClickedPatterncolors();
 	afx_msg void OnBnClickedDisplayFlats();
 	afx_msg void OnCbnEditchangeFontSize();
+
 	afx_msg void OnBnClickedButtonAppearanceSave();		// // // 050B
 	afx_msg void OnBnClickedButtonAppearanceLoad();		// // // 050B
+	
+	afx_msg void OnCbnSelchangeFontPercent();
+	afx_msg void OnCbnEditchangeFontPercent();
+	void onChangeFontPercent(CString text);
 };
