@@ -246,14 +246,6 @@ CPatternEditor::~CPatternEditor()
 
 // Drawing
 
-const int PERCENT = 100;
-
-
-int calculateFontSize(const int rowHeight, const int fontPercent) {
-	return (rowHeight * fontPercent + PERCENT / 2) / PERCENT;
-}
-
-
 void CPatternEditor::ApplyColorScheme()
 {
 	// The color scheme has changed
@@ -1113,6 +1105,9 @@ void CPatternEditor::DrawRow(CDC *pDC, int Row, int Line, int Frame, bool bPrevi
 	const COLORREF SEL_DRAG_COL	  = 0xA08080;
 
 	const unsigned int PREVIEW_SHADE_LEVEL = 70;
+
+	// TODO use dependency injection on pSettings, so we can use a 
+	// CPatternEditor object to preview our color picker.
 
 	const CSettings *pSettings = theApp.GetSettings();		// // //
 

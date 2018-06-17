@@ -177,3 +177,15 @@ const COLOR_SCHEME SATURDAY_COLOR_SCHEME = {
 	_T("Courier"),		// Font
 	11					// Font size
 };
+
+
+// honestly belongs in CPatternEditor. ConfigAppearance should use
+// CPatternEditor to draw the preview.
+// Maybe CPatternEditor and CFrameEditor should use/mixin a Grid class.
+
+const int _PERCENT = 100;
+
+inline int calculateFontSize(const int rowHeight, const int fontPercent) {
+	return (rowHeight * fontPercent + _PERCENT / 2) / _PERCENT;
+}
+
