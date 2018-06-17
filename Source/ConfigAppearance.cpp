@@ -29,6 +29,7 @@
 #include <string>
 #include "NumConv.h"		// // //
 #include "utils/ftmath.h"
+#include <algorithm>
 
 const TCHAR *CConfigAppearance::COLOR_ITEMS[] = {
 	_T("Background"), 
@@ -66,6 +67,8 @@ const int CConfigAppearance::FONT_SIZE_COUNT = sizeof(FONT_SIZES) / sizeof(int);
 
 const int FONT_PERCENTAGES[] = {80, 90, 100, 110, 120};
 
+const long MIN_PERCENT = 50;
+const long MAX_PERCENT = 200;
 const int LEN_PERCENT = 3;	// len(200)
 
 int CALLBACK CConfigAppearance::EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD FontType, LPARAM lParam)
@@ -489,8 +492,6 @@ void CConfigAppearance::OnCbnEditchangeFontSize()		// // //
 }
 
 
-const int MAX_PERCENT = 200;
-
 void CConfigAppearance::OnCbnSelchangeFontPercent() {
 	CString text;
 	this->fontPercentList.GetLBText(fontPercentList.GetCurSel(), text);
@@ -508,7 +509,8 @@ void CConfigAppearance::onChangeFontPercent(CString text) {
 	if (!maybe) return;
 
 	long percent = *maybe;
-	if (percent < 0 || percent > MAX_PERCENT) return;
+	percent = std::clamp(percent, MIN_PERCENT, MAX_PERCENT);
+	//if (percent < MIN_PERCENT || percent > MAX_PERCENT) return;
 
 	this->fontPercent = percent;
 	RedrawWindow();
