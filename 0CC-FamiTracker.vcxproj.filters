@@ -1280,9 +1280,6 @@
     <ClInclude Include="Source\stdafx.h">
       <Filter>Header Files\Windows Headers</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files\Windows Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\WinSDK\VersionHelpers.h">
       <Filter>Header Files\Windows Headers</Filter>
     </ClInclude>
@@ -1430,9 +1427,15 @@
     <ClInclude Include="Source\type_safe\visitor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\NumConv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>Header Files\Windows Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="0CC-FamiTracker.rc">
+    <ResourceCompile Include="res\0CC-FamiTracker.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

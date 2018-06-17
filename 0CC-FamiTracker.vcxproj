@@ -323,6 +323,7 @@
     <ClInclude Include="Source\FrameEditorTypes.h" />
     <ClInclude Include="Source\IntRange.h" />
     <ClInclude Include="Source\NoteQueue.h" />
+    <ClInclude Include="Source\NumConv.h" />
     <ClInclude Include="Source\PatternComponent.h" />
     <ClInclude Include="Source\RegisterState.h" />
     <ClInclude Include="Source\CompoundAction.h" />
