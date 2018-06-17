@@ -66,6 +66,8 @@ const int CConfigAppearance::FONT_SIZE_COUNT = sizeof(FONT_SIZES) / sizeof(int);
 
 const int FONT_PERCENTAGES[] = {80, 90, 100, 110, 120};
 
+const int LEN_PERCENT = 3;	// len(200)
+
 int CALLBACK CConfigAppearance::EnumFontFamExProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD FontType, LPARAM lParam)
 {
 	if (lpelfe->elfLogFont.lfCharSet == ANSI_CHARSET && lpelfe->elfFullName[0] != '@' &&
@@ -332,6 +334,8 @@ BOOL CConfigAppearance::OnInitDialog()
 	percentStr.Format(_T("%d"), this->fontPercent);
 	fontPercentList.SelectString(0, percentStr);
 	fontPercentList.SetWindowText(percentStr);
+
+	fontPercentList.LimitText(LEN_PERCENT);
 
 
 	return TRUE;  // FALSE if you set the focus to a control
