@@ -1315,8 +1315,7 @@ void CPatternEditor::DrawRow(CDC *pDC, int Row, int Line, int Frame, bool bPrevi
 	}
 }
 
-static const int HEIGHT_OFFSET = 8;
-static const int DESCENDER_OFFSET = 2;
+static const int HEIGHT_OFFSET = 6;
 
 void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Channel, bool bInvert, stChanNote *pNoteData, RowColorInfo_t *pColorInfo) const
 {
@@ -1376,14 +1375,6 @@ void CPatternEditor::DrawCell(CDC *pDC, int PosX, cursor_column_t Column, int Ch
 
 	int PosY = m_iRowHeight;
 	PosY -= PosY / HEIGHT_OFFSET;
-
-	TEXTMETRIC textMetrics;
-	if (GetTextMetrics(*pDC, &textMetrics)) {
-		// TODO speed hit?
-		PosY -= textMetrics.tmDescent / DESCENDER_OFFSET;	// to accomodate the tail of Q
-	} else {
-		// This occurs when loading missing/corrupted (improperly uninstalled) fonts.
-	}
 
 	// Compute vertical position for empty bars
 	const int halfX = m_iCharWidth / 2;
