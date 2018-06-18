@@ -30,6 +30,7 @@
 #include "NumConv.h"		// // //
 #include "utils/ftmath.h"
 #include <algorithm>
+#include <array>
 
 const TCHAR *CConfigAppearance::COLOR_ITEMS[] = {
 	_T("Background"), 
@@ -65,7 +66,22 @@ const int CConfigAppearance::NUM_COLOR_SCHEMES = sizeof(COLOR_SCHEMES) / sizeof(
 const int CConfigAppearance::FONT_SIZES[] = {10, 11, 12, 14, 16, 18, 20, 22};
 const int CConfigAppearance::FONT_SIZE_COUNT = sizeof(FONT_SIZES) / sizeof(int);
 
-const int FONT_PERCENTAGES[] = {80, 90, 100, 110, 120};
+constexpr int
+LowPercent {80},
+HiPercent {120},
+StepPercent {5},
+nPercent {(HiPercent - LowPercent) / StepPercent + 1};
+
+constexpr auto GetPercentages() {
+	std::array<int, nPercent> percentages{};
+	for (int i = 0; i < nPercent; i++) {
+		percentages[i] = LowPercent + StepPercent * i;
+	}
+	return percentages;
+}
+
+
+constexpr auto FONT_PERCENTAGES = GetPercentages();
 
 const long MIN_PERCENT = 50;
 const long MAX_PERCENT = 200;
