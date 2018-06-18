@@ -68,7 +68,7 @@ const int CConfigAppearance::FONT_SIZE_COUNT = sizeof(FONT_SIZES) / sizeof(int);
 
 constexpr int
 LowPercent {80},
-HiPercent {120},
+HiPercent {125},
 StepPercent {5},
 nPercent {(HiPercent - LowPercent) / StepPercent + 1};
 
