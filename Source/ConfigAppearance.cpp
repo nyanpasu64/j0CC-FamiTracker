@@ -587,6 +587,9 @@ void CConfigAppearance::ImportSettings(const char *Path)		// // // 050B
 	std::fstream file {Path, std::ios_base::in};
 	std::string Line;
 
+	// Reset settings to default, if missing from .txt.
+	this->fontPercent = _PERCENT;
+
 	while (true) {
 		std::getline(file, Line);
 		if (!file) break;
@@ -594,7 +597,7 @@ void CConfigAppearance::ImportSettings(const char *Path)		// // // 050B
 		if (Pos == std::string::npos)
 			continue;
 		auto sv = std::string_view(Line).substr(Pos + std::size(SETTING_SEPARATOR) - 1);		// // //
-		
+
 		for (size_t i = 0; i < sizeof(m_iColors) / sizeof(*m_iColors); ++i) {
 			if (Line.find(COLOR_ITEMS[i]) == std::string::npos)
 				continue;
