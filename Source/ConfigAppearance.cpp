@@ -258,7 +258,7 @@ void CConfigAppearance::OnPaint()
 		BAR(OffsetLeft + 68, OffsetTop - 2);
 		BAR(OffsetLeft + 84, OffsetTop - 2);
 		BAR(OffsetLeft + 96, OffsetTop - 2);
-		BAR(OffsetLeft + 108, OffsetTop - 2);
+		// Removed call to BAR() because it overflows available space.
 	}
 
 	dc.SelectObject(OldFont);
