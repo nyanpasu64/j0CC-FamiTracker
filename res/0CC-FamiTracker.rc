@@ -230,7 +230,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Estimate Song Length",       ID_MODULE_ESTIMATESONGLENGTH
     END
-    POPUP "&Module"
+    POPUP "&Global"
     BEGIN
         MENUITEM "&Module Properties...\tCtrl+P", ID_MODULE_MODULEPROPERTIES
         MENUITEM "&Comments...",                ID_MODULE_COMMENTS
