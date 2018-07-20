@@ -22,6 +22,9 @@
 #pragma warning (push)
 #pragma warning (disable:4091) // a microsoft header has warnings. Very nice.
 #include <Dbghelp.h>
+#include <exception>
+#include <Source/str_conv/str_conv.hpp>
+
 #pragma warning (pop)
 #include "Exception.h"
 #include "../version.h"
@@ -118,10 +121,19 @@ static LONG WINAPI ExceptionHandler(__in struct _EXCEPTION_POINTERS *ep)
 	// Display a message
 	CString text;
 	text.Format(_T("This application has encountered a problem and needs to close.\n\n"));
-	text.AppendFormat(_T("Unhandled exception %X.\n\n"), ep->ExceptionRecord->ExceptionCode);
+	if (ep) {
+		if (ep->ExceptionRecord->ExceptionCode == 0xE06D7363) {		// // //
+			auto msg = conv::to_t(reinterpret_cast<const std::exception *>(ep->ExceptionRecord->ExceptionInformation[1])->what());
+			text.AppendFormat(_T("Unhandled C++ exception: \"%.*s\".\n\n"), msg.size(), msg.data());
+		}
+		else {
+			text.AppendFormat(_T("Unhandled exception %X.\n\n"), ep->ExceptionRecord->ExceptionCode);
+		}
+	} else {
+		text.AppendFormat(_T("Unhandled exception (null, this should not happen, please contact nyanpasu64).\n\n"));
+	}
 	text.AppendFormat(_T("A memory dump file has been created (%s), please include this if you file a bug report!\n\n"), LPCTSTR(MinidumpFile));
 	text.AppendFormat(_T("Attempting to save current module as %s."), LPCTSTR(DocDumpFile));
-//	text.Append(_T("Application will now close."));
 	AfxMessageBox(text, MB_ICONSTOP);
 
 	// Try to save the document
