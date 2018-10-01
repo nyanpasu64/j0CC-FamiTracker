@@ -49,6 +49,9 @@
 
 #include <cmath>
 #include <assert.h>
+#include <iostream>
+#include <chrono>
+#include <map>
 
 using std::get_if;
 
@@ -818,12 +821,32 @@ void CFamiTrackerView::OnSetFocus(CWnd* pOldWnd)
 	InvalidateCursor();
 }
 
+namespace cr = std::chrono;
+using clk = cr::steady_clock;
+
+static cr::time_point<clk> prevTime;
+static std::map<UINT_PTR, int> counts;
+
 void CFamiTrackerView::OnTimer(UINT_PTR nIDEvent)
 {
+	counts[nIDEvent]++;
+
+	const auto t = cr::floor<cr::seconds>(clk::now() - cr::milliseconds(100));
+	if (t > prevTime) {
+		prevTime = t;
+
+		std::cerr << "CFamiTrackerView::OnTimer called times:\n";
+		for (const auto& kv : counts) {
+			std::cerr << kv.first << " called times= " << kv.second << std::endl;
+		}
+		std::cerr << std::endl;
+		counts.clear();
+	}
+
 	// Timer callback function
 	switch (nIDEvent) {
 		// Drawing updates when playing
-		case TMR_UPDATE: 
+		case TMR_UPDATE:
 			PeriodicUpdate();
 			break;
 

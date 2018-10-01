@@ -42,6 +42,11 @@
 #include "WinInet.h"		// // //
 #pragma comment(lib, "wininet.lib")
 
+#include <iostream>
+#include <chrono>
+#include <map>
+
+
 // Single instance-stuff
 const TCHAR FT_SHARED_MUTEX_NAME[]	= _T("FamiTrackerMutex");	// Name of global mutex
 const TCHAR FT_SHARED_MEM_NAME[]	= _T("FamiTrackerWnd");		// Name of global memory area
@@ -752,8 +757,29 @@ void CFamiTrackerApp::ReloadColorScheme()
 	}
 }
 
+
+namespace cr = std::chrono;
+using clk = cr::steady_clock;
+
+static cr::time_point<clk> prevTime;
+static std::map<LONG, int> counts;
+
 BOOL CFamiTrackerApp::OnIdle(LONG lCount)		// // //
 {
+	counts[lCount]++;
+
+	const auto t = cr::floor<cr::seconds>(clk::now());
+	if (t > prevTime) {
+		prevTime = t;
+
+		std::cerr << "CFamiTrackerApp::OnIdle called times:\n";
+		for (const auto& kv : counts) {
+			std::cerr << kv.first << " called times= " << kv.second << std::endl;
+		}
+		std::cerr << std::endl;
+		counts.clear();
+	}
+
 	if (CWinApp::OnIdle(lCount))
 		return TRUE;
 
