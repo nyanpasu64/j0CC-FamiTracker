@@ -859,7 +859,7 @@ void CFamiTrackerView::OnTimer(UINT_PTR nIDEvent)
 			break;
 	}
 
-	CView::OnTimer(nIDEvent);
+//	CView::OnTimer(nIDEvent);
 }
 
 void CFamiTrackerView::PeriodicUpdate()

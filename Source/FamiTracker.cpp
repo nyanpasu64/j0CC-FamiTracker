@@ -766,6 +766,7 @@ static std::map<LONG, int> counts;
 
 BOOL CFamiTrackerApp::OnIdle(LONG lCount)		// // //
 {
+	// The default implementation of this member function frees temporary objects and unused dynamic link libraries from memory.
 	counts[lCount]++;
 
 	const auto t = cr::floor<cr::seconds>(clk::now());
@@ -780,8 +781,8 @@ BOOL CFamiTrackerApp::OnIdle(LONG lCount)		// // //
 		counts.clear();
 	}
 
-	if (CWinApp::OnIdle(lCount))
-		return TRUE;
+//	if (CWinApp::OnIdle(lCount))
+//		return TRUE;
 
 	if (m_bVersionReady && !m_pVersionMessage.IsEmpty()) {
 		m_bVersionReady = false;
