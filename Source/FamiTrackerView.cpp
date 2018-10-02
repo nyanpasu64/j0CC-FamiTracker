@@ -131,7 +131,7 @@ const int SINGLE_STEP = 1;				// Size of single step moves (default: 1)
 
 // Timer IDs
 enum { 
-	TMR_UPDATE,
+	TMR_UPDATE = 1,	// timer IDs should be nonzero
 	TMR_SCROLL
 };
 
