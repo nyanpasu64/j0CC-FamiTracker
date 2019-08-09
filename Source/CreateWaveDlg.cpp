@@ -159,14 +159,14 @@ void CCreateWaveDlg::OnBnClickedBegin()
 				CString chanNameC; m_ctlChannelList.GetText(i, chanNameC);
 
 				CString textC;
-				textC.Format(_T("#%02i - "), i + 1);
+				textC.Format(_T("%02i - "), i + 1);
 				textC.Append(chanNameC);
 
 				std::string text = conv::to_utf8(textC);
 				
 				fs::path chanOutPath = outPath;
-				chanOutPath.replace_extension("");
-				chanOutPath += " - "s + text + ".wav"s;
+				chanOutPath.replace_filename("");
+				chanOutPath += text + ".wav"s;
 
 				CString chanOutPathC = conv::to_t(chanOutPath.string()).c_str();
 
