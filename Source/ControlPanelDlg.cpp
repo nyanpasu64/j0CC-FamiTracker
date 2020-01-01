@@ -54,7 +54,7 @@ BOOL CControlPanelDlg::OnCmdMsg(UINT nID, int nCode, void *pExtra,
   if (m_pMainFrame->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo))
     return TRUE;
   //		if (GetParent()->GetParent()->OnCmdMsg(nID, nCode, pExtra,
-  //pHandlerInfo)) 			return TRUE;
+  // pHandlerInfo)) 			return TRUE;
   //	}
   return CDialog::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
 }

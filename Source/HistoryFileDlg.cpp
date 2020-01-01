@@ -23,7 +23,7 @@ INT_PTR HistoryFileDlg::DoModal() {
 // bool fileDialog(CString &fileName, CFamiTrackerApp theApp,
 //		PATHS pathType, BOOL openNotSave,
 //		UINT idTitle, LPCTSTR defaultExt, LPCTSTR defaultName, LPCTSTR
-//filter) {
+// filter) {
 //
 //	DWORD flags = OFN_HIDEREADONLY;
 //	if (openNotSave) {

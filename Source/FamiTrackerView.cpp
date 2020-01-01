@@ -2112,7 +2112,7 @@ void CFamiTrackerView::ReleaseNote(unsigned int Channel, unsigned int Note,
     int ch = pDoc->GetChannelIndex(m_pNoteQueue->Cut(
         MIDI_NOTE(Octave, Note), pDoc->GetChannelType(Channel)));
     //	int ch = pDoc->GetChannelIndex(m_pNoteQueue->Release(MIDI_NOTE(Octave,
-    //Note), pDoc->GetChannelType(Channel)));
+    // Note), pDoc->GetChannelType(Channel)));
     if (ch != -1)
       theApp.GetSoundGenerator()->QueueNote(ch, NoteData, NOTE_PRIO_2);
 
@@ -3419,7 +3419,8 @@ int CFamiTrackerView::TranslateKeyModplug(Keycode Key) const {
     KeyNote = NOTE_As;
     KeyOctave = Octave + 1;
     break; // '"
-    // case 191:	KeyNote = NOTE_B;	KeyOctave = Octave + 1;	break;	// //
+    // case 191:	KeyNote = NOTE_B;	KeyOctave = Octave + 1;	break;	//
+    // //
     // //
 
   case 90:
@@ -4194,7 +4195,8 @@ void CFamiTrackerView::EditReplace(stChanNote &Note) // // //
 {
   AddAction(new CPActionEditNote(Note));
   InvalidateCursor();
-  // pAction->SaveRedoState(static_cast<CMainFrame*>(GetParentFrame()));		//
+  // pAction->SaveRedoState(static_cast<CMainFrame*>(GetParentFrame()));
+  // //
   // // //
 }
 

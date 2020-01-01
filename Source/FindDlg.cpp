@@ -471,8 +471,8 @@ void CFindResultsBox::OnLvnColumnClickFindResults(NMHDR *pNMHDR,
     m_cListResults->SortItemsEx(NoteCompareFunc, (LPARAM)m_cListResults);
     break;
     //	case PATTERN: case FRAME: case ROW: case INST: case VOL:
-    //		m_cListResults->SortItemsEx(HexCompareFunc, (LPARAM)m_cListResults);
-    //break;
+    //		m_cListResults->SortItemsEx(HexCompareFunc,
+    //(LPARAM)m_cListResults); break;
   default:
     if (m_iLastsortColumn >= ID &&
         m_iLastsortColumn < EFFECT + MAX_EFFECT_COLUMNS)

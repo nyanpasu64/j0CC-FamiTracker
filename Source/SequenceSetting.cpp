@@ -109,7 +109,7 @@ void CSequenceSetting::OnLButtonDown(UINT nFlags, CPoint point) {
                                MF_DISABLED); // // // 050B
 //	else if (m_iType == SEQ_PITCH && m_iInstType != INST_2A03)
 //		m_menuPopup.EnableMenuItem(MENU_ID_BASE + SETTING_PITCH_SWEEP,
-//MF_DISABLED);
+// MF_DISABLED);
 #endif
   m_menuPopup.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
                              point.x + rect.left, point.y + rect.top, this);

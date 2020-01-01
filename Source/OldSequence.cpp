@@ -73,8 +73,8 @@ CSequence *COldSequence::Convert(int Type) const {
   pSeq->SetLoopPoint(iLoopPoint);
 
   /*
-  if (Type == SEQ_PITCH || Type == SEQ_HIPITCH) {		// // // (not how
-  they work) if (iLoopPoint != -1) { pSeq->SetItemCount(++ValPtr);
+  if (Type == SEQ_PITCH || Type == SEQ_HIPITCH) {		// // // (not
+  how they work) if (iLoopPoint != -1) { pSeq->SetItemCount(++ValPtr);
                   pSeq->SetItem(ValPtr, pSeq->GetItem(iLoopPoint));
                   pSeq->SetLoopPoint(++iLoopPoint);
           }

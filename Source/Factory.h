@@ -29,8 +29,9 @@
 
 template <typename Key, typename Base> class CFactory {
 public:
-  using FuncType = std::shared_ptr<std::function<Base *()>>; // std::shared_ptr<Base*
-                                                             // (*) ()>;
+  using FuncType =
+      std::shared_ptr<std::function<Base *()>>; // std::shared_ptr<Base*
+                                                // (*) ()>;
   CFactory();
   virtual ~CFactory();
 

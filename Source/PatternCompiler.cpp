@@ -448,7 +448,7 @@ case EF_PORTAOFF:
         if (ChanID != CHANID_DPCM) {
           WriteData(Command(CMD_EFF_TREMOLO));
           //						WriteData(EffParam &
-          //0xF7);
+          // 0xF7);
           WriteData((EffParam & 0xF) << 4 | (EffParam >> 4));
         }
         break;

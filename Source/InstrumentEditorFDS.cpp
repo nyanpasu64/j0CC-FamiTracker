@@ -70,7 +70,7 @@ void CInstrumentEditorFDS::SelectInstrument(
       ->SetPos(m_pInstrument->GetModulationDelay());
 
   //	CheckDlgButton(IDC_ENABLE_FM, m_pInstrument->GetModulationEnable() ? 1 :
-  //0);
+  // 0);
 
   EnableModControls(m_pInstrument->GetModulationEnable());
 }

@@ -600,12 +600,10 @@ void CFamiTrackerDoc::AssertFileData(bool Cond, std::string Msg) const {
 int Engine speed int
 
  {FILE_BLOCK_INFO, 1}
-  Song name									string, 32
-bytes
-  Artist name								string, 32
-bytes
-  Copyright									string, 32
-bytes
+  Song name									string,
+32 bytes Artist name string, 32 bytes
+  Copyright									string,
+32 bytes
 
 000x: End of blocks
 000x: "END"						End of file
@@ -710,7 +708,7 @@ BOOL CFamiTrackerDoc::SaveDocument(LPCTSTR lpszPathName) const {
 
 bool CFamiTrackerDoc::WriteBlocks(CDocumentFile *pDocFile) const {
   static const int DEFAULT_BLOCK_VERSION[] = {
-      // // // TODO: use version info
+  // // // TODO: use version info
 #ifdef TRANSPOSE_FDS
       6, 1, 3, 6, 6, 3, 5, 1, 1, // internal
 #else

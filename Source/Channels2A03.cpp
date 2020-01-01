@@ -170,8 +170,8 @@ void C2A03Square::RefreshChannel() {
     }
   } else {
     WriteRegister(Address + 1, 0x08);
-    // WriteRegister(0x4017, 0x80);	// Manually execute one APU frame sequence
-    // to kill the sweep unit WriteRegister(0x4017, 0x00);
+    // WriteRegister(0x4017, 0x80);	// Manually execute one APU frame
+    // sequence to kill the sweep unit WriteRegister(0x4017, 0x00);
     WriteRegister(Address + 2, HiFreq);
 
     if (LoFreq != (m_iLastPeriod >> 8) || m_bResetEnvelope) // // //
@@ -523,8 +523,8 @@ bool CDPCMChan::HandleEffect(effect_t EffNum, unsigned char EffParam) {
             if (mRetriggerPeriod == 0)
                     mRetriggerCtr = 0;
             else
-                    mRetriggerCtr = mRetriggerPeriod + 1;	// Decremented the
-    same frame in RefreshChannel()
+                    mRetriggerCtr = mRetriggerPeriod + 1;	// Decremented
+    the same frame in RefreshChannel()
     }
     triggerSample() {
             mTriggerSample = true	// play sample this frame.
