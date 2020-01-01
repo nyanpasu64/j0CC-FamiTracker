@@ -600,10 +600,8 @@ void CFamiTrackerDoc::AssertFileData(bool Cond, std::string Msg) const {
 int Engine speed int
 
  {FILE_BLOCK_INFO, 1}
-  Song name									string,
-32 bytes Artist name string, 32 bytes
-  Copyright									string,
-32 bytes
+  Song name string, 32 bytes Artist name string, 32 bytes Copyright
+string, 32 bytes
 
 000x: End of blocks
 000x: "END"						End of file

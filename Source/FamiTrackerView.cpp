@@ -3419,7 +3419,8 @@ int CFamiTrackerView::TranslateKeyModplug(Keycode Key) const {
     KeyNote = NOTE_As;
     KeyOctave = Octave + 1;
     break; // '"
-    // case 191:	KeyNote = NOTE_B;	KeyOctave = Octave + 1;	break;	//
+    // case 191:	KeyNote = NOTE_B;	KeyOctave = Octave + 1;	break;
+    // //
     // //
     // //
 
