@@ -1,17 +1,18 @@
 #pragma once
 
 class NoNotifyEdit : public CEdit {
-	DECLARE_DYNAMIC(NoNotifyEdit)
+  DECLARE_DYNAMIC(NoNotifyEdit)
 
 public:
-	NoNotifyEdit();
-	virtual ~NoNotifyEdit() = default;
+  NoNotifyEdit();
+  virtual ~NoNotifyEdit() = default;
 
 protected:
-	DECLARE_MESSAGE_MAP()
+  DECLARE_MESSAGE_MAP()
 public:
-	void SetWindowTextNoNotify(LPCTSTR s);
+  void SetWindowTextNoNotify(LPCTSTR s);
+
 protected:
-	bool notify;
-	afx_msg BOOL OnEnChange();
+  bool notify;
+  afx_msg BOOL OnEnChange();
 };

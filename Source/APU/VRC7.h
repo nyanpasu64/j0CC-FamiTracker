@@ -7,17 +7,16 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routines, in whole or in part,
 ** must bear this legend.
 */
-
 
 #pragma once
 
@@ -26,34 +25,35 @@
 
 class CVRC7 : public CSoundChip {
 public:
-	CVRC7(CMixer *pMixer);
-	virtual ~CVRC7();
+  CVRC7(CMixer *pMixer);
+  virtual ~CVRC7();
 
-	void Reset();
-	void SetSampleSpeed(uint32_t SampleRate, double ClockRate, uint32_t FrameRate);
-	void SetVolume(float Volume);
+  void Reset();
+  void SetSampleSpeed(uint32_t SampleRate, double ClockRate,
+                      uint32_t FrameRate);
+  void SetVolume(float Volume);
 
-	void Write(uint16_t Address, uint8_t Value);
-	void Log(uint16_t Address, uint8_t Value);		// // //
-	uint8_t Read(uint16_t Address, bool &Mapped);
-	void EndFrame();
-	void Process(uint32_t Time);
-	
-	double GetFreq(int Channel) const;		// // //
+  void Write(uint16_t Address, uint8_t Value);
+  void Log(uint16_t Address, uint8_t Value); // // //
+  uint8_t Read(uint16_t Address, bool &Mapped);
+  void EndFrame();
+  void Process(uint32_t Time);
+
+  double GetFreq(int Channel) const; // // //
 
 protected:
-	static const float  AMPLIFY;
-	static const uint32_t OPL_CLOCK;
+  static const float AMPLIFY;
+  static const uint32_t OPL_CLOCK;
 
 private:
-	OPLL	*m_pOPLLInt;
-	uint32_t	m_iTime;
-	uint32_t	m_iMaxSamples;
+  OPLL *m_pOPLLInt;
+  uint32_t m_iTime;
+  uint32_t m_iMaxSamples;
 
-	int16_t	*m_pBuffer;
-	uint32_t	m_iBufferPtr;
+  int16_t *m_pBuffer;
+  uint32_t m_iBufferPtr;
 
-	uint8_t	m_iSoundReg;
+  uint8_t m_iSoundReg;
 
-	float	m_fVolume;
+  float m_fVolume;
 };

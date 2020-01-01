@@ -7,167 +7,135 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routines, in whole or in part,
 ** must bear this legend.
 */
 
-#include <map>
-#include "stdafx.h"
 #include "chunk.h"
+#include "stdafx.h"
+#include <map>
 
 /**
  * CChunk - Stores NSF data
  *
  */
 
-CChunk::CChunk(chunk_type_t Type, CStringA label) : m_iType(Type), m_strLabel(label), m_iBank(0)
-{
+CChunk::CChunk(chunk_type_t Type, CStringA label)
+    : m_iType(Type), m_strLabel(label), m_iBank(0) {}
+
+CChunk::~CChunk() { Clear(); }
+
+void CChunk::Clear() {
+  for (auto x : m_vChunkData)
+    delete x;
+
+  m_vChunkData.clear();
 }
 
-CChunk::~CChunk()
-{
-	Clear();
+chunk_type_t CChunk::GetType() const { return m_iType; }
+
+LPCSTR CChunk::GetLabel() const { return m_strLabel; }
+
+void CChunk::SetBank(unsigned char Bank) { m_iBank = Bank; }
+
+unsigned char CChunk::GetBank() const { return m_iBank; }
+
+int CChunk::GetLength() const {
+  // Return number of data items in the collection
+  return m_vChunkData.size();
 }
 
-void CChunk::Clear()
-{
-	for (auto x : m_vChunkData)
-		delete x;
-
-	m_vChunkData.clear();
+unsigned short CChunk::GetData(int index) const {
+  return m_vChunkData[index]->GetData();
 }
 
-chunk_type_t CChunk::GetType() const
-{
-	return m_iType;
+unsigned short CChunk::GetDataSize(int index) const {
+  return m_vChunkData[index]->GetSize();
 }
 
-LPCSTR CChunk::GetLabel() const
-{
-	return m_strLabel;
+void CChunk::StoreByte(unsigned char data) {
+  m_vChunkData.push_back(new CChunkDataByte(data));
 }
 
-void CChunk::SetBank(unsigned char Bank)
-{
-	m_iBank = Bank;
+void CChunk::StoreWord(unsigned short data) {
+  m_vChunkData.push_back(new CChunkDataWord(data));
 }
 
-unsigned char CChunk::GetBank() const
-{
-	return m_iBank;
+void CChunk::StoreReference(CStringA refName) {
+  m_vChunkData.push_back(new CChunkDataReference(refName));
 }
 
-int CChunk::GetLength() const
-{
-	// Return number of data items in the collection
-	return m_vChunkData.size();
+void CChunk::StoreBankReference(CStringA refName, int bank) {
+  m_vChunkData.push_back(new CChunkDataBank(refName, bank));
 }
 
-unsigned short CChunk::GetData(int index) const
-{
-	return m_vChunkData[index]->GetData();
+void CChunk::StoreString(const std::vector<char> &data) {
+  m_vChunkData.push_back(new CChunkDataString(data));
 }
 
-unsigned short CChunk::GetDataSize(int index) const
-{
-	return m_vChunkData[index]->GetSize();
+void CChunk::ChangeByte(int index, unsigned char data) {
+  ASSERT(index < (int)m_vChunkData.size());
+  static_cast<CChunkDataByte *>(m_vChunkData[index])->m_data = data;
 }
 
-void CChunk::StoreByte(unsigned char data)
-{
-	m_vChunkData.push_back(new CChunkDataByte(data));
+void CChunk::SetupBankData(int index, unsigned char bank) {
+  ASSERT(index < (int)m_vChunkData.size());
+  static_cast<CChunkDataBank *>(m_vChunkData[index])->m_bank = bank;
 }
 
-void CChunk::StoreWord(unsigned short data)
-{
-	m_vChunkData.push_back(new CChunkDataWord(data));
+unsigned char CChunk::GetStringData(int index, int pos) const {
+  return static_cast<CChunkDataString *>(m_vChunkData[index])->m_vData[pos];
 }
 
-void CChunk::StoreReference(CStringA refName)
-{
-	m_vChunkData.push_back(new CChunkDataReference(refName));
+const std::vector<char> &CChunk::GetStringData(int index) const {
+  return (static_cast<CChunkDataString *>(m_vChunkData[index]))->m_vData;
 }
 
-void CChunk::StoreBankReference(CStringA refName, int bank)
-{
-	m_vChunkData.push_back(new CChunkDataBank(refName, bank));
+LPCSTR CChunk::GetDataRefName(int index) const {
+  CChunkDataReference *pChunkData =
+      dynamic_cast<CChunkDataReference *>(m_vChunkData[index]);
+
+  if (pChunkData != NULL)
+    return pChunkData->m_refName;
+
+  return "";
 }
 
-void CChunk::StoreString(const std::vector<char> &data)
-{
-	m_vChunkData.push_back(new CChunkDataString(data));
+void CChunk::UpdateDataRefName(int index, CStringA &name) {
+  CChunkDataReference *pChunkData =
+      dynamic_cast<CChunkDataReference *>(m_vChunkData[index]);
+
+  if (pChunkData != NULL)
+    pChunkData->m_refName = name;
 }
 
-void CChunk::ChangeByte(int index, unsigned char data)
-{
-	ASSERT(index < (int)m_vChunkData.size());
-	static_cast<CChunkDataByte*>(m_vChunkData[index])->m_data = data;
+bool CChunk::IsDataReference(int index) const {
+  return dynamic_cast<CChunkDataReference *>(m_vChunkData[index]) != NULL;
 }
 
-void CChunk::SetupBankData(int index, unsigned char bank)
-{
-	ASSERT(index < (int)m_vChunkData.size());
-	static_cast<CChunkDataBank*>(m_vChunkData[index])->m_bank = bank;
+bool CChunk::IsDataBank(int index) const {
+  return dynamic_cast<CChunkDataBank *>(m_vChunkData[index]) != NULL;
 }
 
-unsigned char CChunk::GetStringData(int index, int pos) const
-{
-	return static_cast<CChunkDataString*>(m_vChunkData[index])->m_vData[pos];
+unsigned int CChunk::CountDataSize() const {
+  // Count sizes of all data items
+  int Size = 0;
+
+  for (const auto pChunk : m_vChunkData)
+    Size += pChunk->GetSize();
+
+  return Size;
 }
 
-const std::vector<char> &CChunk::GetStringData(int index) const
-{
-	return (static_cast<CChunkDataString*>(m_vChunkData[index]))->m_vData;
-}
-
-LPCSTR CChunk::GetDataRefName(int index) const
-{	
-	CChunkDataReference *pChunkData = dynamic_cast<CChunkDataReference*>(m_vChunkData[index]);
-
-	if (pChunkData != NULL)
-		return pChunkData->m_refName;
-
-	return "";
-}
-
-void CChunk::UpdateDataRefName(int index, CStringA &name)
-{
-	CChunkDataReference *pChunkData = dynamic_cast<CChunkDataReference*>(m_vChunkData[index]);
-
-	if (pChunkData != NULL)
-		pChunkData->m_refName = name;
-}
-
-bool CChunk::IsDataReference(int index) const 
-{
-	return dynamic_cast<CChunkDataReference*>(m_vChunkData[index]) != NULL;
-}
-
-bool CChunk::IsDataBank(int index) const
-{
-	return dynamic_cast<CChunkDataBank*>(m_vChunkData[index]) != NULL;
-}
-
-unsigned int CChunk::CountDataSize() const
-{
-	// Count sizes of all data items
-	int Size = 0;
-
-	for (const auto pChunk : m_vChunkData)
-		Size += pChunk->GetSize();
-
-	return Size;
-}
-
-void CChunk::AssignLabels(CMap<CStringA, LPCSTR, int, int> &labelMap)
-{
-	for (auto x : m_vChunkData) if (auto pChunkData = dynamic_cast<CChunkDataReference*>(x))
-		pChunkData->ref = labelMap[pChunkData->m_refName];
+void CChunk::AssignLabels(CMap<CStringA, LPCSTR, int, int> &labelMap) {
+  for (auto x : m_vChunkData)
+    if (auto pChunkData = dynamic_cast<CChunkDataReference *>(x))
+      pChunkData->ref = labelMap[pChunkData->m_refName];
 }

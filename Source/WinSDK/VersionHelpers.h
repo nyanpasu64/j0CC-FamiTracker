@@ -1,29 +1,29 @@
 /******************************************************************
-*                                                                 *
-*  VersionHelpers.h -- This module defines helper functions to    *
-*                      promote version check with proper          *
-*                      comparisons.                               *
-*                                                                 *
-*  Copyright (c) Microsoft Corp.  All rights reserved.            *
-*                                                                 *
-******************************************************************/
+ *                                                                 *
+ *  VersionHelpers.h -- This module defines helper functions to    *
+ *                      promote version check with proper          *
+ *                      comparisons.                               *
+ *                                                                 *
+ *  Copyright (c) Microsoft Corp.  All rights reserved.            *
+ *                                                                 *
+ ******************************************************************/
 #ifndef _versionhelpers_H_INCLUDED_
 #define _versionhelpers_H_INCLUDED_
 
-#include "winapifamily.h"		// // //
+#include "winapifamily.h" // // //
 //#include "sdkddkver.h"		// // //
-#define _WIN32_WINNT_WIN8                   0x0602
-#define _WIN32_WINNT_WINBLUE                0x0603
+#define _WIN32_WINNT_WIN8 0x0602
+#define _WIN32_WINNT_WINBLUE 0x0603
 // http://stackoverflow.com/questions/26829896/version-helper-functions-for-windows-xp
 
 #ifdef _MSC_VER
 #pragma once
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
 #pragma region Application Family
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
-#include <specstrings.h>    // for _In_, etc.
+#include <specstrings.h> // for _In_, etc.
 
 #if !defined(__midl) && !defined(SORTPP_PASS)
 
@@ -33,103 +33,105 @@
 
 #define VERSIONHELPERAPI inline bool
 
-#else  // __cplusplus
+#else // __cplusplus
 
 #define VERSIONHELPERAPI FORCEINLINE BOOL
 
 #endif // __cplusplus
 
 VERSIONHELPERAPI
-IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
-{
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
-    DWORDLONG        const dwlConditionMask = VerSetConditionMask(
-        VerSetConditionMask(
-        VerSetConditionMask(
-            0, VER_MAJORVERSION, VER_GREATER_EQUAL),
-               VER_MINORVERSION, VER_GREATER_EQUAL),
-               VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion,
+                          WORD wServicePackMajor) {
+  OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
+  DWORDLONG const dwlConditionMask = VerSetConditionMask(
+      VerSetConditionMask(
+          VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+          VER_MINORVERSION, VER_GREATER_EQUAL),
+      VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
 
-    osvi.dwMajorVersion = wMajorVersion;
-    osvi.dwMinorVersion = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
+  osvi.dwMajorVersion = wMajorVersion;
+  osvi.dwMinorVersion = wMinorVersion;
+  osvi.wServicePackMajor = wServicePackMajor;
 
-    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
+  return VerifyVersionInfoW(
+             &osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR,
+             dwlConditionMask) != FALSE;
 }
 
 VERSIONHELPERAPI
-IsWindowsXPOrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 0);
+IsWindowsXPOrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP),
+                                   LOBYTE(_WIN32_WINNT_WINXP), 0);
 }
 
 VERSIONHELPERAPI
-IsWindowsXPSP1OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 1);
+IsWindowsXPSP1OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP),
+                                   LOBYTE(_WIN32_WINNT_WINXP), 1);
 }
 
 VERSIONHELPERAPI
-IsWindowsXPSP2OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 2);
+IsWindowsXPSP2OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP),
+                                   LOBYTE(_WIN32_WINNT_WINXP), 2);
 }
 
 VERSIONHELPERAPI
-IsWindowsXPSP3OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
+IsWindowsXPSP3OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP),
+                                   LOBYTE(_WIN32_WINNT_WINXP), 3);
 }
 
 VERSIONHELPERAPI
-IsWindowsVistaOrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
+IsWindowsVistaOrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA),
+                                   LOBYTE(_WIN32_WINNT_VISTA), 0);
 }
 
 VERSIONHELPERAPI
-IsWindowsVistaSP1OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 1);
+IsWindowsVistaSP1OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA),
+                                   LOBYTE(_WIN32_WINNT_VISTA), 1);
 }
 
 VERSIONHELPERAPI
-IsWindowsVistaSP2OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 2);
+IsWindowsVistaSP2OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA),
+                                   LOBYTE(_WIN32_WINNT_VISTA), 2);
 }
 
 VERSIONHELPERAPI
-IsWindows7OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
+IsWindows7OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7),
+                                   LOBYTE(_WIN32_WINNT_WIN7), 0);
 }
 
 VERSIONHELPERAPI
-IsWindows7SP1OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 1);
+IsWindows7SP1OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7),
+                                   LOBYTE(_WIN32_WINNT_WIN7), 1);
 }
 
 VERSIONHELPERAPI
-IsWindows8OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
+IsWindows8OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8),
+                                   LOBYTE(_WIN32_WINNT_WIN8), 0);
 }
 
 VERSIONHELPERAPI
-IsWindows8Point1OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINBLUE), LOBYTE(_WIN32_WINNT_WINBLUE), 0);
+IsWindows8Point1OrGreater() {
+  return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINBLUE),
+                                   LOBYTE(_WIN32_WINNT_WINBLUE), 0);
 }
 
 VERSIONHELPERAPI
-IsWindowsServer()
-{
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0, 0, VER_NT_WORKSTATION };
-    DWORDLONG        const dwlConditionMask = VerSetConditionMask( 0, VER_PRODUCT_TYPE, VER_EQUAL );
+IsWindowsServer() {
+  OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0,
+                           {0},          0, 0, 0, VER_NT_WORKSTATION};
+  DWORDLONG const dwlConditionMask =
+      VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL);
 
-    return !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
+  return !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
 }
 
 #endif // NTDDI_VERSION

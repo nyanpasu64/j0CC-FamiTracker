@@ -9,11 +9,11 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routines, in whole or in part,
@@ -22,72 +22,84 @@
 
 #pragma once
 
-
 #include "WaveformGenerator.h"
 
 /**
-	\brief Partial implementation of the waveform generator.
+        \brief Partial implementation of the waveform generator.
 */
 class CWavegenImp : public CWaveformGenerator {
 public:
-	CWavegenImp(const char *Name);
-	virtual bool CreateWaves(float *const Dest, unsigned int Size, unsigned int Index);
-	const char *GetGeneratorName() const;
-	virtual const char *GetStatus() const;
+  CWavegenImp(const char *Name);
+  virtual bool CreateWaves(float *const Dest, unsigned int Size,
+                           unsigned int Index);
+  const char *GetGeneratorName() const;
+  virtual const char *GetStatus() const;
 
 protected:
-	virtual const char *CreateWavesInternal(float *const Dest, unsigned int Size, unsigned int Index) const = 0;
+  virtual const char *CreateWavesInternal(float *const Dest, unsigned int Size,
+                                          unsigned int Index) const = 0;
 
 protected:
-	bool m_bSuccess;
-	const char *m_pName;
-	const char **m_pError;
+  bool m_bSuccess;
+  const char *m_pName;
+  const char **m_pError;
 
 private:
-	static const char *DEFAULT_ERROR;
+  static const char *DEFAULT_ERROR;
 };
 
 class CWavegenSingle : public CWavegenImp {
 public:
-	CWavegenSingle(const char *Name);
-	virtual bool CreateWaves(float *const Dest, unsigned int Size, unsigned int Index);
-	unsigned int GetCount() const;
+  CWavegenSingle(const char *Name);
+  virtual bool CreateWaves(float *const Dest, unsigned int Size,
+                           unsigned int Index);
+  unsigned int GetCount() const;
+
 private:
-	static const char *COUNT_ERROR;
+  static const char *COUNT_ERROR;
 };
 
 class CWavegenSine : public CWavegenSingle {
 public:
-	CWavegenSine();
-	CWavegenParam *GetParameter(unsigned int Index) const;
+  CWavegenSine();
+  CWavegenParam *GetParameter(unsigned int Index) const;
+
 protected:
-	const char *CreateWavesInternal(float *const Dest, unsigned int Size, unsigned int Index) const;
+  const char *CreateWavesInternal(float *const Dest, unsigned int Size,
+                                  unsigned int Index) const;
 };
 
 class CWavegenSawtooth : public CWavegenSingle {
 public:
-	CWavegenSawtooth();
-	CWavegenParam *GetParameter(unsigned int Index) const;
+  CWavegenSawtooth();
+  CWavegenParam *GetParameter(unsigned int Index) const;
+
 protected:
-	const char *CreateWavesInternal(float *const Dest, unsigned int Size, unsigned int Index) const;
+  const char *CreateWavesInternal(float *const Dest, unsigned int Size,
+                                  unsigned int Index) const;
 };
 
 class CWavegenTriangle : public CWavegenSingle {
 public:
-	CWavegenTriangle();
-	CWavegenParam *GetParameter(unsigned int Index) const;
+  CWavegenTriangle();
+  CWavegenParam *GetParameter(unsigned int Index) const;
+
 protected:
-	const char *CreateWavesInternal(float *const Dest, unsigned int Size, unsigned int Index) const;
+  const char *CreateWavesInternal(float *const Dest, unsigned int Size,
+                                  unsigned int Index) const;
 };
 
 class CWavegenPulse : public CWavegenSingle {
 public:
-	CWavegenPulse();
-	virtual ~CWavegenPulse();
-	CWavegenParam *GetParameter(unsigned int Index) const;
+  CWavegenPulse();
+  virtual ~CWavegenPulse();
+  CWavegenParam *GetParameter(unsigned int Index) const;
+
 protected:
-	const char *CreateWavesInternal(float *const Dest, unsigned int Size, unsigned int Index) const;
+  const char *CreateWavesInternal(float *const Dest, unsigned int Size,
+                                  unsigned int Index) const;
+
 private:
-	CWavegenParamFloat *m_pPulseWidth;
-	static const char *PULSE_WIDTH_ERROR;
+  CWavegenParamFloat *m_pPulseWidth;
+  static const char *PULSE_WIDTH_ERROR;
 };

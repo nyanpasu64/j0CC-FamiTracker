@@ -9,11 +9,11 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routines, in whole or in part,
@@ -22,28 +22,26 @@
 
 #pragma once
 
-
 #include "stdafx.h"
 
 /*!
-	\brief An extension of the MFC file class with methods for writing and reading in different
-	data types.
-	\details This class replaces CInstrumentFile.
+        \brief An extension of the MFC file class with methods for writing and
+   reading in different data types. \details This class replaces
+   CInstrumentFile.
 */
-class CSimpleFile : public CFile
-{
+class CSimpleFile : public CFile {
 public:
-	CSimpleFile(LPCTSTR lpszFileName, UINT nOpenFlags);
+  CSimpleFile(LPCTSTR lpszFileName, UINT nOpenFlags);
 
-	void	WriteChar(char Value);
-	void	WriteShort(short Value);
-	void	WriteInt(int Value);
-	void	WriteString(CString Str);
-	void	WriteStringNull(CString Buf);
+  void WriteChar(char Value);
+  void WriteShort(short Value);
+  void WriteInt(int Value);
+  void WriteString(CString Str);
+  void WriteStringNull(CString Buf);
 
-	char	ReadChar();
-	short	ReadShort();
-	int		ReadInt();
-	CString	ReadString();
-	CString ReadStringNull();
+  char ReadChar();
+  short ReadShort();
+  int ReadInt();
+  CString ReadString();
+  CString ReadStringNull();
 };

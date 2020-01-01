@@ -9,11 +9,11 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routines, in whole or in part,
@@ -26,53 +26,57 @@
 // Derived channels, N163
 //
 
-class CChannelHandlerN163 : public FrequencyChannelHandler, public CChannelHandlerInterfaceN163 {
+class CChannelHandlerN163 : public FrequencyChannelHandler,
+                            public CChannelHandlerInterfaceN163 {
 public:
-	CChannelHandlerN163();
-	void	RefreshChannel() override;
-	void	ResetChannel() override;
+  CChannelHandlerN163();
+  void RefreshChannel() override;
+  void ResetChannel() override;
 
-	void	SetWaveLength(int Length);		// // //
-	void	SetWavePosition(int Pos);
-	void	SetWaveCount(int Count);
-	void	FillWaveRAM(const char *Buffer, int Count);
+  void SetWaveLength(int Length); // // //
+  void SetWavePosition(int Pos);
+  void SetWaveCount(int Count);
+  void FillWaveRAM(const char *Buffer, int Count);
 
-	void	SetChannelCount(int Count);		// // //
+  void SetChannelCount(int Count); // // //
 
-	int getDutyMax() const override;
+  int getDutyMax() const override;
 
 protected:
-	bool	HandleEffect(effect_t EffNum, unsigned char EffParam) override;		// // //
-	bool	HandleInstrument(bool Trigger, bool NewInstrument) override;		// // //
-	void	HandleEmptyNote() override;
-	void	HandleCut() override;
-	void	HandleRelease() override;
-	void	HandleNote(int Note, int Octave) override;
-	bool	CreateInstHandler(inst_type_t Type) override;		// // //
-	void	SetupSlide() override;		// // //
-	int		ConvertDuty(int Duty) const override;		// // //
-	void	ClearRegisters() override;
-	int		CalculatePeriod() const override;		// // //
-	CString	GetSlideEffectString() const override;		// // //
-	CString	GetCustomEffectString() const override;		// // //
+  bool HandleEffect(effect_t EffNum, unsigned char EffParam) override; // // //
+  bool HandleInstrument(bool Trigger, bool NewInstrument) override;    // // //
+  void HandleEmptyNote() override;
+  void HandleCut() override;
+  void HandleRelease() override;
+  void HandleNote(int Note, int Octave) override;
+  bool CreateInstHandler(inst_type_t Type) override; // // //
+  void SetupSlide() override;                        // // //
+  int ConvertDuty(int Duty) const override;          // // //
+  void ClearRegisters() override;
+  int CalculatePeriod() const override;           // // //
+  CString GetSlideEffectString() const override;  // // //
+  CString GetCustomEffectString() const override; // // //
 
 private:
-	void WriteReg(int Reg, int Value);
-	void SetAddress(char Addr, bool AutoInc);
-	void WriteData(char Data);
-	void WriteData(int Addr, char Data);
+  void WriteReg(int Reg, int Value);
+  void SetAddress(char Addr, bool AutoInc);
+  void WriteData(char Data);
+  void WriteData(int Addr, char Data);
+
 private:
-	inline int GetIndex() const { return m_iChannelID - CHANID_N163_CH1; }
+  inline int GetIndex() const { return m_iChannelID - CHANID_N163_CH1; }
+
 private:
-	bool m_bLoadWave;
-	bool m_bDisableLoad;		// // //
-	int m_iChannels;
-	int m_iWaveLen;
-	int m_iWavePos;
-	int m_iWavePosOld;			// // //
-	int m_iWaveCount;
+  bool m_bLoadWave;
+  bool m_bDisableLoad; // // //
+  int m_iChannels;
+  int m_iWaveLen;
+  int m_iWavePos;
+  int m_iWavePosOld; // // //
+  int m_iWaveCount;
+
 protected:
-	// // //
+  // // //
 
-	bool m_bResetPhase;
+  bool m_bResetPhase;
 };

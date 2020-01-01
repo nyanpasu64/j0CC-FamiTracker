@@ -1,305 +1,272 @@
-#define NO_WARN_MBCS_MFC_DEPRECATION		// // // MBCS
-#include <afx.h>
-#include "CustomExporterInterfaces.h"
+#define NO_WARN_MBCS_MFC_DEPRECATION // // // MBCS
 #include "CustomExporter_C_Interface.h"
+#include "CustomExporterInterfaces.h"
+#include <afx.h>
 
-CFamiTrackerDocInterface* _doc = NULL;
+CFamiTrackerDocInterface *_doc = NULL;
 
-//function to tell C interface where to find famitracker doc for call forwarding
-void SetDoc(CFamiTrackerDocInterface* doc)
-{
-	_doc = doc;
+// function to tell C interface where to find famitracker doc for call
+// forwarding
+void SetDoc(CFamiTrackerDocInterface *doc) { _doc = doc; }
+
+// function to fill FamitrackerDocInterface object with pointers to all the C
+// interface functions
+void GetInterface(FamitrackerDocInterface *iface) {
+  // overall document functions
+  iface->GetNoteData = GetNoteData;
+  iface->GetFrameCount = GetFrameCount;
+  iface->GetPatternLength = GetPatternLength;
+  iface->GetSongSpeed = GetSongSpeed;
+
+  // sequence functions
+  iface->GetSequenceCount = GetSequenceCount;
+  iface->GetSequence = GetSequence;
+
+  iface->GetItem = GetItem;
+  iface->GetItemCount = GetItemCount;
+  iface->GetLoopPoint = GetLoopPoint;
+
+  // instrument functions
+  iface->GetInstrumentCount = GetInstrumentCount;
+  iface->Get2A03Instrument = Get2A03Instrument;
+  iface->GetSeqInstrument = GetSeqInstrument; // // //
+
+  iface->GetSeqEnable = GetSeqEnable;
+  iface->GetSeqIndex = GetSeqIndex;
+
+  // effect functions
+  iface->GetNoteEffectType = GetNoteEffectType;
+  iface->GetNoteEffectParam = GetNoteEffectParam;
+
+  // DPCM functions
+  iface->GetSampleCount = GetSampleCount;
+  iface->GetSampleName = GetSampleName;
+  iface->GetSampleSize = GetSampleSize;
+  iface->GetSampleData = GetSampleData;
+
+  // DPCM instrument functions
+  iface->GetSample = GetSample;
+  iface->GetSamplePitch = GetSamplePitch;
+  iface->GetSampleLoopOffset = GetSampleLoopOffset;
 }
 
-//function to fill FamitrackerDocInterface object with pointers to all the C interface functions
-void GetInterface(FamitrackerDocInterface* iface)
-{
-	//overall document functions
-	iface->GetNoteData = GetNoteData;
-	iface->GetFrameCount = GetFrameCount;
-	iface->GetPatternLength = GetPatternLength;
-	iface->GetSongSpeed = GetSongSpeed;
+// overall document functions
+void GetNoteData(unsigned int Frame, unsigned int Channel, unsigned int Row,
+                 stChanNote *Data) {
+  if (NULL == _doc) {
+    return;
+  }
 
-	//sequence functions
-	iface->GetSequenceCount = GetSequenceCount;
-	iface->GetSequence = GetSequence;
-
-	iface->GetItem = GetItem;
-	iface->GetItemCount = GetItemCount;
-	iface->GetLoopPoint = GetLoopPoint;
-
-	//instrument functions
-	iface->GetInstrumentCount = GetInstrumentCount;
-	iface->Get2A03Instrument = Get2A03Instrument;
-	iface->GetSeqInstrument = GetSeqInstrument;		// // //
-
-	iface->GetSeqEnable = GetSeqEnable;
-	iface->GetSeqIndex = GetSeqIndex;
-
-	//effect functions
-	iface->GetNoteEffectType = GetNoteEffectType;
-	iface->GetNoteEffectParam = GetNoteEffectParam;
-
-	//DPCM functions
-	iface->GetSampleCount = GetSampleCount;
-	iface->GetSampleName = GetSampleName;
-	iface->GetSampleSize = GetSampleSize;
-	iface->GetSampleData = GetSampleData;
-
-	//DPCM instrument functions
-	iface->GetSample = GetSample;
-	iface->GetSamplePitch = GetSamplePitch;
-	iface->GetSampleLoopOffset = GetSampleLoopOffset;
+  _doc->GetNoteData(Frame, Channel, Row, Data);
 }
 
-//overall document functions
-void GetNoteData(unsigned int Frame, unsigned int Channel, unsigned int Row, stChanNote *Data)
-{
-	if (NULL == _doc)
-	{
-		return;
-	}
+unsigned int GetFrameCount() {
+  if (NULL == _doc) {
+    return 0;
+  }
 
-	_doc->GetNoteData(Frame, Channel, Row, Data);
+  return _doc->GetFrameCount();
 }
 
-unsigned int GetFrameCount()
-{
-	if (NULL == _doc)
-	{
-		return 0;
-	}
+unsigned int GetPatternLength() {
+  if (NULL == _doc) {
+    return 0;
+  }
 
-	return _doc->GetFrameCount();
+  return _doc->GetPatternLength();
 }
 
-unsigned int GetPatternLength()
-{
-	if (NULL == _doc)
-	{
-		return 0;
-	}
+unsigned int GetSongSpeed() {
+  if (NULL == _doc) {
+    return -1;
+  }
 
-	return _doc->GetPatternLength();
+  return _doc->GetSongSpeed();
 }
 
-unsigned int GetSongSpeed()
-{
-	if (NULL == _doc)
-	{
-		return -1;
-	}
+// sequence functions
+int GetSequenceCount(int Type) {
+  if (NULL == _doc) {
+    return 0;
+  }
 
-	return _doc->GetSongSpeed();
+  return _doc->GetSequenceCount(Type);
 }
 
-//sequence functions
-int GetSequenceCount(int Type)
-{
-	if (NULL == _doc)
-	{
-		return 0;
-	}
+SequenceHandle GetSequence(int Index, int Type) {
+  if (NULL == _doc) {
+    return NULL;
+  }
 
-	return _doc->GetSequenceCount(Type);
+  return static_cast<SequenceHandle>(_doc->GetSequence(Index, Type));
 }
 
-SequenceHandle GetSequence(int Index, int Type)
-{
-	if (NULL == _doc)
-	{
-		return NULL;
-	}
-	
-	return static_cast<SequenceHandle>(_doc->GetSequence(Index, Type));
+signed char GetItem(SequenceHandle sequence, int Index) {
+  if (NULL == sequence) {
+    return 0;
+  }
+
+  CSequenceInterface const *sequenceInterface =
+      static_cast<CSequenceInterface const *>(sequence);
+
+  return sequenceInterface->GetItem(Index);
 }
 
-signed char GetItem(SequenceHandle sequence, int Index)
-{
-	if (NULL == sequence)
-	{
-		return 0;
-	}
+unsigned int GetItemCount(SequenceHandle sequence) {
+  if (NULL == sequence) {
+    return 0;
+  }
 
-	CSequenceInterface const* sequenceInterface = static_cast<CSequenceInterface const*>(sequence);
+  CSequenceInterface const *sequenceInterface =
+      static_cast<CSequenceInterface const *>(sequence);
 
-	return sequenceInterface->GetItem(Index);
+  return sequenceInterface->GetItemCount();
 }
 
-unsigned int GetItemCount(SequenceHandle sequence)
-{
-	if (NULL == sequence)
-	{
-		return 0;
-	}
+unsigned int GetLoopPoint(SequenceHandle sequence) {
+  if (NULL == sequence) {
+    return 0;
+  }
 
-	CSequenceInterface const* sequenceInterface = static_cast<CSequenceInterface const*>(sequence);
+  CSequenceInterface const *sequenceInterface =
+      static_cast<CSequenceInterface const *>(sequence);
 
-	return sequenceInterface->GetItemCount();
+  return sequenceInterface->GetLoopPoint();
 }
 
-unsigned int GetLoopPoint(SequenceHandle sequence)
-{
-	if (NULL == sequence)
-	{
-		return 0;
-	}
+// instrument functions
+int GetInstrumentCount() {
+  if (NULL == _doc) {
+    return 0;
+  }
 
-	CSequenceInterface const* sequenceInterface = static_cast<CSequenceInterface const*>(sequence);
-	
-	return sequenceInterface->GetLoopPoint();
+  return _doc->GetInstrumentCount();
 }
 
-//instrument functions
-int GetInstrumentCount()
-{
-	if (NULL == _doc)
-	{
-		return 0;
-	}
-	
-	return _doc->GetInstrumentCount();
+Instrument2A03Handle Get2A03Instrument(int Instrument) {
+  if (NULL == _doc) {
+    return NULL;
+  }
+
+  return static_cast<Instrument2A03Handle>(_doc->Get2A03Instrument(Instrument));
 }
 
-Instrument2A03Handle Get2A03Instrument(int Instrument)
+SeqInstrumentHandle GetSeqInstrument(int Instrument) // // //
 {
-	if (NULL == _doc)
-	{
-		return NULL;
-	}
+  if (NULL == _doc) {
+    return NULL;
+  }
 
-	return static_cast<Instrument2A03Handle>(_doc->Get2A03Instrument(Instrument));
+  return static_cast<SeqInstrumentHandle>(_doc->GetSeqInstrument(Instrument));
 }
 
-SeqInstrumentHandle GetSeqInstrument(int Instrument)		// // //
+int GetSeqEnable(SeqInstrumentHandle instrument, int Index) // // //
 {
-	if (NULL == _doc)
-	{
-		return NULL;
-	}
+  if (NULL == instrument) {
+    return 0;
+  }
 
-	return static_cast<SeqInstrumentHandle>(_doc->GetSeqInstrument(Instrument));
+  CSeqInstrumentInterface const *instrumentInterface =
+      static_cast<CSeqInstrumentInterface const *>(instrument);
+
+  return instrumentInterface->GetSeqEnable(Index);
 }
 
-int GetSeqEnable(SeqInstrumentHandle instrument, int Index)		// // //
+int GetSeqIndex(SeqInstrumentHandle instrument, int Index) // // //
 {
-	if (NULL == instrument)
-	{
-		return 0;
-	}
+  if (NULL == instrument) {
+    return 0;
+  }
 
-	CSeqInstrumentInterface const* instrumentInterface = static_cast<CSeqInstrumentInterface const*>(instrument);
-	
-	return instrumentInterface->GetSeqEnable(Index);
+  CSeqInstrumentInterface const *instrumentInterface =
+      static_cast<CSeqInstrumentInterface const *>(instrument);
+
+  return instrumentInterface->GetSeqIndex(Index);
 }
 
-int GetSeqIndex(SeqInstrumentHandle instrument, int Index)		// // //
-{
-	if (NULL == instrument)
-	{
-		return 0;
-	}
+// effect functions
+unsigned int GetNoteEffectType(unsigned int Frame, unsigned int Channel,
+                               unsigned int Row, int Index) {
+  if (NULL == _doc) {
+    return -1;
+  }
 
-	CSeqInstrumentInterface const* instrumentInterface = static_cast<CSeqInstrumentInterface const*>(instrument);
-
-	return instrumentInterface->GetSeqIndex(Index);
+  return _doc->GetNoteEffectType(Frame, Channel, Row, Index);
 }
 
-//effect functions
-unsigned int GetNoteEffectType(unsigned int Frame, unsigned int Channel, unsigned int Row, int Index)
-{
-	if (NULL == _doc)
-	{
-		return -1;
-	}
+unsigned int GetNoteEffectParam(unsigned int Frame, unsigned int Channel,
+                                unsigned int Row, int Index) {
+  if (NULL == _doc) {
+    return -1;
+  }
 
-	return _doc->GetNoteEffectType(Frame, Channel, Row, Index);
+  return _doc->GetNoteEffectParam(Frame, Channel, Row, Index);
 }
 
-unsigned int GetNoteEffectParam(unsigned int Frame, unsigned int Channel, unsigned int Row, int Index)
-{
-	if (NULL == _doc)
-	{
-		return -1;
-	}
+// DPCM functions
+int GetSampleCount() {
+  if (NULL == _doc) {
+    return -1;
+  }
 
-	return _doc->GetNoteEffectParam(Frame, Channel, Row, Index);
+  return _doc->GetSampleCount();
 }
 
-//DPCM functions
-int GetSampleCount()
-{
-	if (NULL == _doc)
-	{
-		return -1;
-	}
+void GetSampleName(unsigned int Index, char *Name) {
+  if (NULL == _doc) {
+    return;
+  }
 
-	return _doc->GetSampleCount();
+  _doc->GetSampleName(Index, Name);
 }
 
-void GetSampleName(unsigned int Index, char *Name)
-{
-	if (NULL == _doc)
-	{
-		return;
-	}
+int GetSampleSize(unsigned int Sample) {
+  if (NULL == _doc) {
+    return -1;
+  }
 
-	_doc->GetSampleName(Index, Name);
+  return _doc->GetSampleSize(Sample);
 }
 
-int GetSampleSize(unsigned int Sample)
-{
-	if (NULL == _doc)
-	{
-		return -1;
-	}
+char GetSampleData(unsigned int Sample, unsigned int Offset) {
+  if (NULL == _doc) {
+    return 0;
+  }
 
-	return _doc->GetSampleSize(Sample);
+  return _doc->GetSampleData(Sample, Offset);
 }
 
-char GetSampleData(unsigned int Sample, unsigned int Offset)
-{
-	if (NULL == _doc)
-	{
-		return 0;
-	}
+// DPCM instrument functions
+char GetSample(Instrument2A03Handle instrument, int Octave, int Note) {
+  if (NULL == instrument) {
+    return 0;
+  }
 
-	return _doc->GetSampleData(Sample, Offset);
+  CInstrument2A03Interface const *instrumentInterface =
+      static_cast<CInstrument2A03Interface const *>(instrument);
+
+  return instrumentInterface->GetSample(Octave, Note);
 }
 
-//DPCM instrument functions
-char GetSample(Instrument2A03Handle instrument, int Octave, int Note)
-{
-	if (NULL == instrument)
-	{
-		return 0;
-	}
+char GetSamplePitch(Instrument2A03Handle instrument, int Octave, int Note) {
+  if (NULL == instrument) {
+    return 0;
+  }
 
-	CInstrument2A03Interface const* instrumentInterface = static_cast<CInstrument2A03Interface const*>(instrument);
+  CInstrument2A03Interface const *instrumentInterface =
+      static_cast<CInstrument2A03Interface const *>(instrument);
 
-	return instrumentInterface->GetSample(Octave, Note);
+  return instrumentInterface->GetSamplePitch(Octave, Note);
 }
 
-char GetSamplePitch(Instrument2A03Handle instrument, int Octave, int Note)
-{
-	if (NULL == instrument)
-	{
-		return 0;
-	}
+char GetSampleLoopOffset(Instrument2A03Handle instrument, int Octave,
+                         int Note) {
+  if (NULL == instrument) {
+    return 0;
+  }
 
-	CInstrument2A03Interface const* instrumentInterface = static_cast<CInstrument2A03Interface const*>(instrument);
+  CInstrument2A03Interface const *instrumentInterface =
+      static_cast<CInstrument2A03Interface const *>(instrument);
 
-	return instrumentInterface->GetSamplePitch(Octave, Note);
-}
-
-char GetSampleLoopOffset(Instrument2A03Handle instrument, int Octave, int Note)
-{
-	if (NULL == instrument)
-	{
-		return 0;
-	}
-
-	CInstrument2A03Interface const* instrumentInterface = static_cast<CInstrument2A03Interface const*>(instrument);
-
-	return instrumentInterface->GetSampleLoopOffset(Octave, Note);
+  return instrumentInterface->GetSampleLoopOffset(Octave, Note);
 }

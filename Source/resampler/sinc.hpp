@@ -25,60 +25,49 @@
 #define SINC_HPP
 
 //------------------------------------------------------------------------
-#include <vector>
 #include <cstddef>
+#include <vector>
 //------------------------------------------------------------------------
 //#include <xutility>
 
-namespace jarh
-{
-
-
+namespace jarh {
 
 using std::size_t;
 
-
-
-class sinc
-{
+class sinc {
 public:
-    /** ctor:
-      *   calls resize.
-      */
-    sinc(size_t sz, size_t firstnull, float gain=1.f);
+  /** ctor:
+   *   calls resize.
+   */
+  sinc(size_t sz, size_t firstnull, float gain = 1.f);
 
-    /** resize:
-      *   resize internal table and recompute values in it
-      *     sz        = size of the vector
-      *     firstnull = steps before the first null of sinc.
-      *     gain      = the integral of the sinc will be this value.
-      *
-      */
-    void resize(size_t sz, size_t firstnull, float gain=1.f);
+  /** resize:
+   *   resize internal table and recompute values in it
+   *     sz        = size of the vector
+   *     firstnull = steps before the first null of sinc.
+   *     gain      = the integral of the sinc will be this value.
+   *
+   */
+  void resize(size_t sz, size_t firstnull, float gain = 1.f);
 
-    /** operator():
-      *   'compute' the value sinc(x).
-      *     x = evaluate sinc at this value
-      */
-    float operator()(float x) const;
+  /** operator():
+   *   'compute' the value sinc(x).
+   *     x = evaluate sinc at this value
+   */
+  float operator()(float x) const;
 
-    /** range:
-      *   upper range of sinc. Anything outside [-range..range] yields 0.
-      */
-    float range() const { return tbl_.size() / convfactor_; };
+  /** range:
+   *   upper range of sinc. Anything outside [-range..range] yields 0.
+   */
+  float range() const { return tbl_.size() / convfactor_; };
 
 private:
-    std::vector<float> tbl_;
-    float convfactor_;
-
+  std::vector<float> tbl_;
+  float convfactor_;
 };
 //------------------------------------------------------------------------
 
-
-
 } // namespace jarh
-
-
 
 //------------------------------------------------------------------------
 #endif

@@ -10,10 +10,10 @@
 
 #include "resample.hpp"
 //------------------------------------------------------------------------
-#include <limits>
-#include <cmath>
-#include <numeric>
 #include <algorithm>
+#include <cmath>
+#include <limits>
+#include <numeric>
 //------------------------------------------------------------------------
 
 /** Below is for debug purpose only; normally commented-out**/
@@ -23,7 +23,8 @@
 
 namespace std {
 template <typename T, typename InIter1, typename InIter2>
- T inner_product2_2eA6jpo51vPqr9ww(InIter1 first1, InIter1 last1, InIter2 first2, T init)
+ T inner_product2_2eA6jpo51vPqr9ww(InIter1 first1, InIter1 last1, InIter2
+first2, T init)
 {
     for (;first1 != last1; ++first1, ++first2)
     {
@@ -40,125 +41,97 @@ template <typename T, typename InIter1, typename InIter2>
 
 /** small utility class to change a function object into an iterator **/
 
-template <typename func>
-class func_iterator {
-    func f_;
-    float x_;
-    float step_;
+template <typename func> class func_iterator {
+  func f_;
+  float x_;
+  float step_;
 
 public:
-    typedef std::forward_iterator_tag iterator_category;
-    typedef float value_type;
-    typedef ptrdiff_t difference_type;
-    typedef float* pointer;
-    typedef float& reference;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef float value_type;
+  typedef ptrdiff_t difference_type;
+  typedef float *pointer;
+  typedef float &reference;
 
-    func_iterator(func f, float initval, float step=1.f)
-     : f_(f), x_(initval), step_(step) {}
+  func_iterator(func f, float initval, float step = 1.f)
+      : f_(f), x_(initval), step_(step) {}
 
-    func_iterator &operator++() { x_ += step_; return *this; }
-    float operator*() { return f_(x_); }
+  func_iterator &operator++() {
+    x_ += step_;
+    return *this;
+  }
+  float operator*() { return f_(x_); }
 };
 
 /** small utility function to create a func_iterator **/
 
 template <typename func>
- func_iterator<func> make_func_iterator(func f, float init, float step)
-{
-    return func_iterator<func>(f, init, step);
+func_iterator<func> make_func_iterator(func f, float init, float step) {
+  return func_iterator<func>(f, init, step);
 }
 
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
 
-
-
 /** Implementation of the interp_base class **/
 
-
-
-namespace jarh
-{
-
-
+namespace jarh {
 
 //------------------------------------------------------------------------
 // resample_base(const sinc &s) -
 //
 //------------------------------------------------------------------------
-resample_base::resample_base(const sinc &s)
- : flags_(goodbit), sinc_(s)
-{
-}
+resample_base::resample_base(const sinc &s) : flags_(goodbit), sinc_(s) {}
 //------------------------------------------------------------------------
 // cutoff(float thecutoff) -
 //
 //------------------------------------------------------------------------
-void resample_base::cutoff(float thecutoff)
-{
-    // limit cutoff_ in the range ]0-1]
-    cutoff_ = (std::min)(
-                       1.f,
-                       std::max(
-                                std::numeric_limits<float>::epsilon(),
-                                thecutoff
-                                )
-                       );
+void resample_base::cutoff(float thecutoff) {
+  // limit cutoff_ in the range ]0-1]
+  cutoff_ = (std::min)(
+      1.f, std::max(std::numeric_limits<float>::epsilon(), thecutoff));
 }
 //------------------------------------------------------------------------
 // ratio(float theratio) -
 //
 //------------------------------------------------------------------------
-void resample_base::ratio(float theratio)
-{
-    // ratio_ can't be 0 or below.
-    ratio_   = (std::max)(std::numeric_limits<float>::epsilon(), theratio);
-    invratio_= 1.f/ratio_;
+void resample_base::ratio(float theratio) {
+  // ratio_ can't be 0 or below.
+  ratio_ = (std::max)(std::numeric_limits<float>::epsilon(), theratio);
+  invratio_ = 1.f / ratio_;
 
-    sincstep_= (std::min)(1.f, ratio_) * cutoff_;
+  sincstep_ = (std::min)(1.f, ratio_) * cutoff_;
 
-    buf_.resize(1 +
-                static_cast<size_t>(std::floor(
-                          2*sinc_.range() / sincstep_
-                          ))
-            );
+  buf_.resize(1 +
+              static_cast<size_t>(std::floor(2 * sinc_.range() / sincstep_)));
 }
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-float resample_base::conv() const
-{
-    return std::inner_product(buf_.begin(),
-                              buf_.end(),
-                              make_func_iterator(sinc_,
-                                                -sinc_.range() + sincstep_ - subidx_ * sincstep_,
-                                                 sincstep_
-                                            ),
-                                0.f);
+float resample_base::conv() const {
+  return std::inner_product(
+      buf_.begin(), buf_.end(),
+      make_func_iterator(
+          sinc_, -sinc_.range() + sincstep_ - subidx_ * sincstep_, sincstep_),
+      0.f);
 }
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-size_t resample_base::updateidx()
-{
-    subidx_         += invratio_;
-    const size_t inc = static_cast<size_t>(subidx_);
-    subidx_         -= inc;
+size_t resample_base::updateidx() {
+  subidx_ += invratio_;
+  const size_t inc = static_cast<size_t>(subidx_);
+  subidx_ -= inc;
 
-    remainsamples_ -= invratio_;
-    if (remainsamples_ < 0)
-    {
-        setstate(eofbit | failbit);
-    }
-    return inc;
+  remainsamples_ -= invratio_;
+  if (remainsamples_ < 0) {
+    setstate(eofbit | failbit);
+  }
+  return inc;
 }
 //------------------------------------------------------------------------
-
-
 
 } // namespace jarh
-
-
 
 //------------------------------------------------------------------------

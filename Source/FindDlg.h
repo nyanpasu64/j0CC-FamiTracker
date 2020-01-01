@@ -9,57 +9,65 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful, 
+** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-** Library General Public License for more details.  To obtain a 
-** copy of the GNU Library General Public License, write to the Free 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.  To obtain a
+** copy of the GNU Library General Public License, write to the Free
 ** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 ** Any permitted reproduction of these routin, in whole or in part,
 ** must bear this legend.
 */
 
-
 #pragma once
 
 #include <string>
 #include <unordered_map>
 
-#include "PatternNote.h"
 #include "PatternEditorTypes.h"
+#include "PatternNote.h"
 
-class CharRange
-{
+class CharRange {
 public:
-	CharRange() { Min = '\x00'; Max = '\xFF'; };
-	CharRange(unsigned char a, unsigned char b) { Min = a; Max = b; };
-	void Set(unsigned char x, bool Half = false) { if (!Half) Min = x; Max = x; };
-	bool IsMatch(unsigned char x) const { return (x >= Min && x <= Max) || (x >= Max && x <= Min); };
-	bool IsSingle() const { return Min == Max; };
-	unsigned char Min;
-	unsigned char Max;
+  CharRange() {
+    Min = '\x00';
+    Max = '\xFF';
+  };
+  CharRange(unsigned char a, unsigned char b) {
+    Min = a;
+    Max = b;
+  };
+  void Set(unsigned char x, bool Half = false) {
+    if (!Half)
+      Min = x;
+    Max = x;
+  };
+  bool IsMatch(unsigned char x) const {
+    return (x >= Min && x <= Max) || (x >= Max && x <= Min);
+  };
+  bool IsSingle() const { return Min == Max; };
+  unsigned char Min;
+  unsigned char Max;
 };
 
-class searchTerm
-{
+class searchTerm {
 public:
-	searchTerm();
-	searchTerm(searchTerm &&other);
-	searchTerm& operator=(searchTerm &&other);
+  searchTerm();
+  searchTerm(searchTerm &&other);
+  searchTerm &operator=(searchTerm &&other);
 
-	std::unique_ptr<CharRange> Note, Oct, Inst, Vol;
-	bool EffNumber[EF_COUNT];
-	std::unique_ptr<CharRange> EffParam;
-	bool Definite[6];
-	bool NoiseChan;
+  std::unique_ptr<CharRange> Note, Oct, Inst, Vol;
+  bool EffNumber[EF_COUNT];
+  std::unique_ptr<CharRange> EffParam;
+  bool Definite[6];
+  bool NoiseChan;
 };
 
-struct replaceTerm
-{
-	stChanNote Note;
-	bool Definite[6];
-	bool NoiseChan;
+struct replaceTerm {
+  stChanNote Note;
+  bool Definite[6];
+  bool NoiseChan;
 };
 
 class CFamiTrackerDoc;
@@ -67,187 +75,195 @@ class CFamiTrackerView;
 class CCompoundAction;
 
 /*!
-	\brief An extension of the pattern iterator that allows constraining the cursor position within
-	a given selection.
+        \brief An extension of the pattern iterator that allows constraining the
+   cursor position within a given selection.
 */
-class CFindCursor : public CPatternIterator
-{
+class CFindCursor : public CPatternIterator {
 public:
-	/*!	\brief An enumeration representing the directions that the cursor can traverse. */
-	enum class direction_t { UP, DOWN, LEFT, RIGHT };
+  /*!	\brief An enumeration representing the directions that the cursor can
+   * traverse. */
+  enum class direction_t { UP, DOWN, LEFT, RIGHT };
 
-	/*!	\brief Constructor of the find / replace cursor.
-		\param pEditor Pointer to the document.
-		\param Track The current song number.
-		\param Pos The cursor position at which searching begins.
-		\param Scope The area that the cursor operates on. */
-	CFindCursor(CFamiTrackerDoc *pDoc, int Track, const CCursorPos &Pos, const CSelection &Scope);
+  /*!	\brief Constructor of the find / replace cursor.
+          \param pEditor Pointer to the document.
+          \param Track The current song number.
+          \param Pos The cursor position at which searching begins.
+          \param Scope The area that the cursor operates on. */
+  CFindCursor(CFamiTrackerDoc *pDoc, int Track, const CCursorPos &Pos,
+              const CSelection &Scope);
 
-	CFindCursor(const CFindCursor &other) = default;
-	CFindCursor &operator=(const CFindCursor &other) = default;
+  CFindCursor(const CFindCursor &other) = default;
+  CFindCursor &operator=(const CFindCursor &other) = default;
 
-	/*!	\brief Moves the cursor in the given direction while limiting the cursor within the scope.
-		\details If the cursor was outside its scope when this method is called, it will be moved to
-		an appropriate initial position.
-		\param Dir The direction. */
-	void Move(direction_t Dir);
+  /*!	\brief Moves the cursor in the given direction while limiting the cursor
+     within the scope. \details If the cursor was outside its scope when this
+     method is called, it will be moved to an appropriate initial position.
+          \param Dir The direction. */
+  void Move(direction_t Dir);
 
-	/*!	\brief Checks whether the cursor reaches its starting position, as given in the
-		constructor.
-		\return True if the cursor is at the starting position. */
-	bool AtStart() const;
+  /*!	\brief Checks whether the cursor reaches its starting position, as given
+     in the constructor.
+          \return True if the cursor is at the starting position. */
+  bool AtStart() const;
 
-	/*!	\brief Copies a note from the current song.
-		\details Similar to CPatternIterator::Get, but accepts no arguments.
-		\param pNote Pointer to the output note. */
-	void Get(stChanNote *pNote) const;
+  /*!	\brief Copies a note from the current song.
+          \details Similar to CPatternIterator::Get, but accepts no arguments.
+          \param pNote Pointer to the output note. */
+  void Get(stChanNote *pNote) const;
 
-	/*!	\brief Writes a note to the current song.
-		\details Similar to CPatternIterator::Set, but accepts no arguments.
-		\param pNote Pointer to the input note. */
-	void Set(const stChanNote *pNote);
+  /*!	\brief Writes a note to the current song.
+          \details Similar to CPatternIterator::Set, but accepts no arguments.
+          \param pNote Pointer to the input note. */
+  void Set(const stChanNote *pNote);
 
-	/*!	\brief Resets the cursor to an appropriate initial position if it does not lie within its
-		scope.
-		\param Dir The movement direction. */
-	void ResetPosition(direction_t Dir);
+  /*!	\brief Resets the cursor to an appropriate initial position if it does
+     not lie within its scope. \param Dir The movement direction. */
+  void ResetPosition(direction_t Dir);
 
-	/*!	\brief Checks whether the cursor lies within the scope provided in the constructor.
-		\details This method is similar to CPatternEditor::IsInRange but ignores the column index
-		of the cursor.
-		\return True if the scope contains the cursor itself. */
-	bool Contains() const;
+  /*!	\brief Checks whether the cursor lies within the scope provided in the
+     constructor. \details This method is similar to CPatternEditor::IsInRange
+     but ignores the column index of the cursor. \return True if the scope
+     contains the cursor itself. */
+  bool Contains() const;
 
 private:
-	CCursorPos m_cpBeginPos;
-	const CSelection m_Scope;
+  CCursorPos m_cpBeginPos;
+  const CSelection m_Scope;
 };
 
 // Exception for find dialog
 
-class CFindException : public std::runtime_error
-{
+class CFindException : public std::runtime_error {
 public:
-	CFindException(const char *msg) : std::runtime_error(msg) { }
+  CFindException(const char *msg) : std::runtime_error(msg) {}
 };
 
 // CFindResultsBox dialog
 
-class CFindResultsBox : public CDialog
-{
-	DECLARE_DYNAMIC(CFindResultsBox)
+class CFindResultsBox : public CDialog {
+  DECLARE_DYNAMIC(CFindResultsBox)
 public:
-	CFindResultsBox(CWnd* pParent = NULL); // standard constructor
-	virtual ~CFindResultsBox();
-	
-	virtual void DoDataExchange(CDataExchange* pDX);
+  CFindResultsBox(CWnd *pParent = NULL); // standard constructor
+  virtual ~CFindResultsBox();
 
-	void AddResult(const stChanNote *pNote, const CFindCursor *pCursor, bool Noise) const;
-	void ClearResults();
+  virtual void DoDataExchange(CDataExchange *pDX);
+
+  void AddResult(const stChanNote *pNote, const CFindCursor *pCursor,
+                 bool Noise) const;
+  void ClearResults();
 
 protected:
-	CListCtrl *m_cListResults;
+  CListCtrl *m_cListResults;
 
-	enum result_column_t
-	{
-		ID,
-		CHANNEL, PATTERN, FRAME, ROW,
-		NOTE, INST, VOL,
-		EFFECT,
-		COUNT = EFFECT + MAX_EFFECT_COLUMNS
-	};
+  enum result_column_t {
+    ID,
+    CHANNEL,
+    PATTERN,
+    FRAME,
+    ROW,
+    NOTE,
+    INST,
+    VOL,
+    EFFECT,
+    COUNT = EFFECT + MAX_EFFECT_COLUMNS
+  };
 
-	static result_column_t m_iLastsortColumn;
-	static bool m_bLastSortDescending;
-	static std::unordered_map<std::string, int> m_iChannelPositionCache;
+  static result_column_t m_iLastsortColumn;
+  static bool m_bLastSortDescending;
+  static std::unordered_map<std::string, int> m_iChannelPositionCache;
 
-	static int CALLBACK IntCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-	static int CALLBACK HexCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-	static int CALLBACK StringCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-	static int CALLBACK ChannelCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-	static int CALLBACK NoteCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+  static int CALLBACK IntCompareFunc(LPARAM lParam1, LPARAM lParam2,
+                                     LPARAM lParamSort);
+  static int CALLBACK HexCompareFunc(LPARAM lParam1, LPARAM lParam2,
+                                     LPARAM lParamSort);
+  static int CALLBACK StringCompareFunc(LPARAM lParam1, LPARAM lParam2,
+                                        LPARAM lParamSort);
+  static int CALLBACK ChannelCompareFunc(LPARAM lParam1, LPARAM lParam2,
+                                         LPARAM lParamSort);
+  static int CALLBACK NoteCompareFunc(LPARAM lParam1, LPARAM lParam2,
+                                      LPARAM lParamSort);
 
-	void SelectItem(int Index);
-	void UpdateCount() const;
+  void SelectItem(int Index);
+  void UpdateCount() const;
 
 protected:
-	DECLARE_MESSAGE_MAP()
+  DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL OnInitDialog();
-	virtual BOOL PreTranslateMessage(MSG *pMsg);
-	afx_msg void OnNMDblclkListFindresults(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnColumnClickFindResults(NMHDR *pNMHDR, LRESULT *pResult);
+  virtual BOOL OnInitDialog();
+  virtual BOOL PreTranslateMessage(MSG *pMsg);
+  afx_msg void OnNMDblclkListFindresults(NMHDR *pNMHDR, LRESULT *pResult);
+  afx_msg void OnLvnColumnClickFindResults(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 // CFindDlg dialog
 
-class CFindDlg : public CDialog
-{
-	DECLARE_DYNAMIC(CFindDlg)
+class CFindDlg : public CDialog {
+  DECLARE_DYNAMIC(CFindDlg)
 
 public:
-	CFindDlg(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CFindDlg();
+  CFindDlg(CWnd *pParent = NULL); // standard constructor
+  virtual ~CFindDlg();
 
-	void Reset();
+  void Reset();
 
-// Dialog Data
-	enum { IDD = IDD_FIND };
+  // Dialog Data
+  enum { IDD = IDD_FIND };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+  virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
 
-	void ParseNote(searchTerm &Term, CString str, bool Half);
-	void ParseInst(searchTerm &Term, CString str, bool Half);
-	void ParseVol(searchTerm &Term, CString str, bool Half);
-	void ParseEff(searchTerm &Term, CString str, bool Half);
-	void GetFindTerm();
-	void GetReplaceTerm();
+  void ParseNote(searchTerm &Term, CString str, bool Half);
+  void ParseInst(searchTerm &Term, CString str, bool Half);
+  void ParseVol(searchTerm &Term, CString str, bool Half);
+  void ParseEff(searchTerm &Term, CString str, bool Half);
+  void GetFindTerm();
+  void GetReplaceTerm();
 
-	bool CompareFields(const stChanNote Target, bool Noise, int EffCount);
+  bool CompareFields(const stChanNote Target, bool Noise, int EffCount);
 
-	template <typename... T>
-	void RaiseIf(bool Check, LPCTSTR Str, T... args);
+  template <typename... T> void RaiseIf(bool Check, LPCTSTR Str, T... args);
 
-	replaceTerm toReplace(const searchTerm *x);
+  replaceTerm toReplace(const searchTerm *x);
 
-	bool PrepareFind();
-	bool PrepareReplace();
-	void PrepareCursor(bool ReplaceAll);
+  bool PrepareFind();
+  bool PrepareReplace();
+  void PrepareCursor(bool ReplaceAll);
 
-	bool Find(bool ShowEnd);
-	bool Replace(CCompoundAction *pAction = nullptr);
-	
-	CFamiTrackerDoc *m_pDocument;
-	CFamiTrackerView *m_pView;
+  bool Find(bool ShowEnd);
+  bool Replace(CCompoundAction *pAction = nullptr);
 
-	CEdit *m_cFindNoteField, *m_cFindInstField, *m_cFindVolField, *m_cFindEffField;
-	CEdit *m_cFindNoteField2, *m_cFindInstField2, *m_cFindVolField2;
-	CEdit *m_cReplaceNoteField, *m_cReplaceInstField, *m_cReplaceVolField, *m_cReplaceEffField;
-	CComboBox *m_cSearchArea, *m_cEffectColumn;
+  CFamiTrackerDoc *m_pDocument;
+  CFamiTrackerView *m_pView;
 
-	searchTerm m_searchTerm;
-	replaceTerm m_replaceTerm;
-	bool m_bFound, m_bSkipFirst, m_bReplacing;
+  CEdit *m_cFindNoteField, *m_cFindInstField, *m_cFindVolField,
+      *m_cFindEffField;
+  CEdit *m_cFindNoteField2, *m_cFindInstField2, *m_cFindVolField2;
+  CEdit *m_cReplaceNoteField, *m_cReplaceInstField, *m_cReplaceVolField,
+      *m_cReplaceEffField;
+  CComboBox *m_cSearchArea, *m_cEffectColumn;
 
-	CFindCursor *m_pFindCursor;
-	CFindCursor::direction_t m_iSearchDirection;
+  searchTerm m_searchTerm;
+  replaceTerm m_replaceTerm;
+  bool m_bFound, m_bSkipFirst, m_bReplacing;
 
-	CFindResultsBox *m_cResultsBox;
+  CFindCursor *m_pFindCursor;
+  CFindCursor::direction_t m_iSearchDirection;
 
-	static const CString m_pNoteName[7];
-	static const CString m_pNoteSign[3];
-	static const int m_iNoteOffset[7];
+  CFindResultsBox *m_cResultsBox;
 
-	DECLARE_MESSAGE_MAP()
+  static const CString m_pNoteName[7];
+  static const CString m_pNoteSign[3];
+  static const int m_iNoteOffset[7];
+
+  DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL OnInitDialog();
-	afx_msg void UpdateFields();
-	afx_msg void OnUpdateFields(UINT nID);
-	afx_msg void OnBnClickedButtonFindNext();
-	afx_msg void OnBnClickedButtonFindPrevious();
-	afx_msg void OnBnClickedButtonFindAll();
-	afx_msg void OnBnClickedButtonReplaceNext();
-	afx_msg void OnBnClickedButtonReplacePrevious();
-	afx_msg void OnBnClickedButtonReplaceall();
+  virtual BOOL OnInitDialog();
+  afx_msg void UpdateFields();
+  afx_msg void OnUpdateFields(UINT nID);
+  afx_msg void OnBnClickedButtonFindNext();
+  afx_msg void OnBnClickedButtonFindPrevious();
+  afx_msg void OnBnClickedButtonFindAll();
+  afx_msg void OnBnClickedButtonReplaceNext();
+  afx_msg void OnBnClickedButtonReplacePrevious();
+  afx_msg void OnBnClickedButtonReplaceall();
 };

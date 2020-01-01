@@ -23,14 +23,16 @@
 #endif
 
 #ifndef TYPE_SAFE_ENABLE_WRAPPER
-/// Controls whether the typedefs in [types.hpp]() use the type safe wrapper types.
+/// Controls whether the typedefs in [types.hpp]() use the type safe wrapper
+/// types.
 ///
 /// It is enabled by default.
 #define TYPE_SAFE_ENABLE_WRAPPER 1
 #endif
 
 #ifndef TYPE_SAFE_ARITHMETIC_UB
-/// Controls whether [ts::arithmetic_policy_default]() is [ts::undefined_behavior_arithmetic]() or [ts::default_arithmetic]().
+/// Controls whether [ts::arithmetic_policy_default]() is
+/// [ts::undefined_behavior_arithmetic]() or [ts::default_arithmetic]().
 ///
 /// It is [ts::undefined_behavior_arithmetic]() by default.
 #define TYPE_SAFE_ARITHMETIC_UB 1
@@ -58,7 +60,8 @@
 #endif
 
 #ifndef TYPE_SAFE_USE_RETURN_TYPE_DEDUCTION
-#if defined(__cpp_return_type_deduction) && __cpp_return_type_deduction >= 201304
+#if defined(__cpp_return_type_deduction) &&                                    \
+    __cpp_return_type_deduction >= 201304
 /// \exclude
 #define TYPE_SAFE_USE_RETURN_TYPE_DEDUCTION 1
 #elif defined(_MSC_VER) && _MSC_VER >= 1900
@@ -139,12 +142,10 @@
 #else
 
 /// \exclude
-namespace type_safe
-{
-    namespace detail
-    {
-        void on_disabled_exception() noexcept;
-    }
+namespace type_safe {
+namespace detail {
+void on_disabled_exception() noexcept;
+}
 } // namespace type_safe
 
 #define TYPE_SAFE_THROW(Ex) (Ex, type_safe::detail::on_disabled_exception())

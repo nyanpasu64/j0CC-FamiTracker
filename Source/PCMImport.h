@@ -21,63 +21,62 @@
 #pragma once
 
 namespace jarh {
-	class sinc;
+class sinc;
 }
 
-class CPCMImport : public CDialog
-{
-	DECLARE_DYNAMIC(CPCMImport)
+class CPCMImport : public CDialog {
+  DECLARE_DYNAMIC(CPCMImport)
 
 public:
-	CPCMImport(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CPCMImport();
+  CPCMImport(CWnd *pParent = NULL); // standard constructor
+  virtual ~CPCMImport();
 
-// Dialog Data
-	enum { IDD = IDD_PCMIMPORT };
+  // Dialog Data
+  enum { IDD = IDD_PCMIMPORT };
 
-	CDSample *ShowDialog();
-
-protected:
-	CDSample *m_pImported;
-	CDSample *m_pCachedSample;
-
-	CString		m_strPath, m_strFileName;
-	CFile		m_fSampleFile;
-	ULONGLONG	m_ullSampleStart;
-
-	int m_iQuality;
-	int m_iVolume;
-	int m_iSampleSize;
-	int m_iChannels;
-	int m_iBlockAlign;
-	int m_iAvgBytesPerSec;
-	int m_iSamplesPerSec;
-	int m_iCachedQuality;
-	int m_iCachedVolume;
-	unsigned int m_iWaveSize;
-
-	jarh::sinc *m_psinc;
+  CDSample *ShowDialog();
 
 protected:
-	static const int QUALITY_RANGE;
-	static const int VOLUME_RANGE;
+  CDSample *m_pImported;
+  CDSample *m_pCachedSample;
+
+  CString m_strPath, m_strFileName;
+  CFile m_fSampleFile;
+  ULONGLONG m_ullSampleStart;
+
+  int m_iQuality;
+  int m_iVolume;
+  int m_iSampleSize;
+  int m_iChannels;
+  int m_iBlockAlign;
+  int m_iAvgBytesPerSec;
+  int m_iSamplesPerSec;
+  int m_iCachedQuality;
+  int m_iCachedVolume;
+  unsigned int m_iWaveSize;
+
+  jarh::sinc *m_psinc;
 
 protected:
-	CDSample *GetSample();
-	CDSample *ConvertFile();
-
-	bool OpenWaveFile();
-	void UpdateFileInfo();
-	void UpdateText();
+  static const int QUALITY_RANGE;
+  static const int VOLUME_RANGE;
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+  CDSample *GetSample();
+  CDSample *ConvertFile();
 
-	DECLARE_MESSAGE_MAP()
+  bool OpenWaveFile();
+  void UpdateFileInfo();
+  void UpdateText();
+
+protected:
+  virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
+
+  DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL OnInitDialog();
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnBnClickedCancel();
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedPreview();
+  virtual BOOL OnInitDialog();
+  afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar);
+  afx_msg void OnBnClickedCancel();
+  afx_msg void OnBnClickedOk();
+  afx_msg void OnBnClickedPreview();
 };
