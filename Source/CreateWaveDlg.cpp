@@ -54,6 +54,8 @@ BEGIN_MESSAGE_MAP(CCreateWaveDlg, CDialog)
 	ON_BN_CLICKED(IDC_BEGIN, &CCreateWaveDlg::OnBnClickedBegin)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_LOOP, &CCreateWaveDlg::OnDeltaposSpinLoop)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_TIME, &CCreateWaveDlg::OnDeltaposSpinTime)
+	ON_BN_CLICKED(IDC_RADIO_LOOP, &CCreateWaveDlg::OnBnClickedRadioLoop)
+	ON_BN_CLICKED(IDC_CHECK_INDIVIDUAL_CHANNELS, &CCreateWaveDlg::OnBnClickedCheckIndividualChannels)
 END_MESSAGE_MAP()
 
 int CCreateWaveDlg::GetFrameLoopCount() const
@@ -217,4 +219,23 @@ void CCreateWaveDlg::OnDeltaposSpinTime(NMHDR *pNMHDR, LRESULT *pResult)
 	CheckDlgButton(IDC_RADIO_LOOP, BST_UNCHECKED);
 	CheckDlgButton(IDC_RADIO_TIME, BST_CHECKED);
 	*pResult = 0;
+}
+
+
+void CCreateWaveDlg::OnBnClickedRadioLoop()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CCreateWaveDlg::OnBnClickedCheckIndividualChannels()
+{
+	if (IsDlgButtonChecked(IDC_CHECK_INDIVIDUAL_CHANNELS)) {
+		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(TRUE);
+	}
+	else {
+		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(FALSE);
+		BOOL isUnchecked = false;
+		CheckDlgButton(IDC_CHECK_NONLINEAR_MIXING, isUnchecked);
+	}
 }

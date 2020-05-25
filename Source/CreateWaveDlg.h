@@ -51,4 +51,6 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnDeltaposSpinLoop(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinTime(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedRadioLoop();
+	afx_msg void OnBnClickedCheckIndividualChannels();
 };
