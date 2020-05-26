@@ -5,10 +5,11 @@ what i've done so far:
  - extend the highpass filter (bass filtering) to 0 Hz
  - implemented seperate channel export (from an unreleased branch)
  - refresh rate changes depending on whenever you're playing a module or not
+ - added a button that says "enable nonlinear mixing"
 
 what i intend to do:
- - implement optional nonlinear mixing when you mute one or more channels(?)
- - something more?
+ - actually make nonlinear mixing happen
+ - clean up seperate channel export
 
 # j0CC-Famitracker
 
