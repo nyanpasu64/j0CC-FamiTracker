@@ -141,6 +141,7 @@ public:
 		bool	bHexKeypad;
 		bool	bMultiFrameSel;
 		bool	bCheckVersion;		// // //
+		bool	bEnableNonlinearMixing; // this is new
 	} General;
 
 	struct {
