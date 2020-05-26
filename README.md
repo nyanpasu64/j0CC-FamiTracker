@@ -1,3 +1,15 @@
+hacky fork of
+# j0CC-Famitracker
+
+what i've done so far:
+ - extend the highpass filter (bass filtering) to 0 Hz
+ - implemented seperate channel export (from an unreleased branch)
+ - refresh rate changes depending on whenever you're playing a module or not
+
+what i intend to do:
+ - implement optional nonlinear mixing when you mute one or more channels(?)
+ - something more?
+
 # jimbo1qaz 0CC-Famitracker
 
 - Download at https://github.com/jimbo1qaz/0CC-FamiTracker/releases
@@ -21,7 +33,6 @@ Enhancements:
 - Hi-res FFT spectrogram (like master).
 
 Future changes:
-
 - Exponential instrument volume decay or release (like ADSR), and possibly an effect.
 - Warn when editing instrument sequences reused in many instruments, or patterns appearing in many frames.
 - https://github.com/jimbo1qaz/0CC-FamiTracker/issues
