@@ -46,6 +46,7 @@ private:
 	int m_iLevelFDS;
 	int m_iLevelN163;
 	int m_iLevelS5B;
+	BOOL m_bNonlinearMixing;
 
 protected:
 	void SetupSlider(int nID) const;
@@ -61,4 +62,6 @@ public:
 	virtual BOOL OnApply();
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnBnClickedButtonMixerReset();		// // // 050B
+	afx_msg void OnBnClickedEnableNonlinearMixing();
+	afx_msg void OnBnClickedNonlinearMixing();
 };

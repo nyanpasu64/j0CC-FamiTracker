@@ -1503,8 +1503,7 @@ BEGIN
     CTEXT           "0.0dB",IDC_LEVEL_S5B,244,149,30,8
     LTEXT           "Hardware mixing levels",IDC_STATIC,7,7,74,8
     PUSHBUTTON      "Reset",IDC_BUTTON_MIXER_RESET,224,7,50,14
-    CONTROL         "Enable nonlinear mixing",IDC_ENABLE_NONLINEAR_MIXING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,183,161,91,10
+    CONTROL         "Enable nonlinear mixing",IDC_NONLINEAR_MIXING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,183,161,91,10
 END
 
 IDD_INSTRUMENT_N163_WAVE DIALOGEX 0, 0, 372, 172

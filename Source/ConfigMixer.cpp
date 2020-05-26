@@ -48,8 +48,8 @@ void CConfigMixer::DoDataExchange(CDataExchange* pDX)
 	DDX_Slider(pDX, IDC_SLIDER_FDS, m_iLevelFDS);
 	DDX_Slider(pDX, IDC_SLIDER_N163, m_iLevelN163);
 	DDX_Slider(pDX, IDC_SLIDER_S5B, m_iLevelS5B);
-
 	UpdateLevels();
+	DDX_Check(pDX, IDC_NONLINEAR_MIXING, m_bNonlinearMixing);
 }
 
 BEGIN_MESSAGE_MAP(CConfigMixer, CPropertyPage)
@@ -75,6 +75,7 @@ BOOL CConfigMixer::OnInitDialog()
 	m_iLevelFDS = -pSettings->ChipLevels.iLevelFDS;
 	m_iLevelN163 = -pSettings->ChipLevels.iLevelN163;
 	m_iLevelS5B = -pSettings->ChipLevels.iLevelS5B;
+	m_bNonlinearMixing = pSettings->bNonlinearMixing;
 
 	SetupSlider(IDC_SLIDER_APU1);
 	SetupSlider(IDC_SLIDER_APU2);
@@ -102,8 +103,7 @@ BOOL CConfigMixer::OnApply()
 	pSettings->ChipLevels.iLevelMMC5 = -m_iLevelMMC5;
 	pSettings->ChipLevels.iLevelFDS = -m_iLevelFDS;
 	pSettings->ChipLevels.iLevelN163 = -m_iLevelN163;
-	pSettings->ChipLevels.iLevelS5B = -m_iLevelS5B;
-
+	pSettings->bNonlinearMixing = -m_bNonlinearMixing;
 	theApp.LoadSoundConfig();
 
 	return CPropertyPage::OnApply();
@@ -134,6 +134,15 @@ void CConfigMixer::UpdateLevels()
 	UpdateLevel(IDC_LEVEL_FDS, m_iLevelFDS);
 	UpdateLevel(IDC_LEVEL_N163, m_iLevelN163);
 	UpdateLevel(IDC_LEVEL_S5B, m_iLevelS5B);
+
+	if (IsDlgButtonChecked(IDC_NONLINEAR_MIXING)) {
+		CSettings* pSettings = theApp.GetSettings();
+		pSettings->bNonlinearMixing = false;
+	}
+	else {
+		CSettings* pSettings = theApp.GetSettings();
+		pSettings->bNonlinearMixing = true;
+	}
 }
 
 void CConfigMixer::UpdateLevel(int nID, int Level)
@@ -155,7 +164,15 @@ void CConfigMixer::OnBnClickedButtonMixerReset()		// // // 050B
 	m_iLevelFDS = 0;
 	m_iLevelN163 = 0;
 	m_iLevelS5B = 0;
-
+	m_bNonlinearMixing = 0;
+	
 	UpdateData(FALSE);
 	SetModified();
+}
+
+
+
+void CConfigMixer::OnBnClickedNonlinearMixing()
+{
+	// TODO: Add your control notification handler code here
 }

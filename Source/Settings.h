@@ -141,7 +141,6 @@ public:
 		bool	bHexKeypad;
 		bool	bMultiFrameSel;
 		bool	bCheckVersion;		// // //
-		bool	bEnableNonlinearMixing; // this is new
 	} General;
 
 	struct {
@@ -222,6 +221,7 @@ public:
 	bool FollowMode;
 	bool MeterDecayRate;		// // // 050B
 	bool m_bNamcoMixing;		// // //
+	bool bNonlinearMixing; // this is new
 
 	struct {
 		int		iLevelAPU1;
