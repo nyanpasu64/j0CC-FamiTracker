@@ -10,7 +10,7 @@ what i intend to do:
  - implement optional nonlinear mixing when you mute one or more channels(?)
  - something more?
 
-# jimbo1qaz 0CC-Famitracker
+# j0CC-Famitracker
 
 - Download at https://github.com/jimbo1qaz/0CC-FamiTracker/releases
 - Dev builds at https://ci.appveyor.com/project/jimbo1qaz/0cc-famitracker/history
