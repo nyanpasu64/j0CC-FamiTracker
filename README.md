@@ -1,4 +1,5 @@
-hacky fork of # j0CC-Famitracker
+hacky fork of
+# j0CC-Famitracker
 
 what i've done so far:
  - extend the highpass filter (bass filtering) to 0 Hz
