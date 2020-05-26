@@ -27,6 +27,10 @@
 #include "TrackerChannel.h"
 #include "WavProgressDlg.h"
 #include "CreateWaveDlg.h"
+#include "str_conv/str_conv.hpp"
+
+//#include <string>
+#include <filesystem>
 
 const int MAX_LOOP_TIMES = 99;
 const int MAX_PLAY_TIME	 = (99 * 60) + 0;
@@ -89,8 +93,23 @@ int CCreateWaveDlg::GetTimeLimit() const
 
 // CCreateWaveDlg message handlers
 
+void CCreateWaveDlg::OnBnClickedCheckIndividualChannels()
+{
+	if (IsDlgButtonChecked(IDC_CHECK_INDIVIDUAL_CHANNELS)) {
+		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(TRUE);
+	}
+	else {
+		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(FALSE);
+		BOOL isUnchecked = false;
+		CheckDlgButton(IDC_CHECK_NONLINEAR_MIXING, isUnchecked);
+	}
+}
+
 void CCreateWaveDlg::OnBnClickedBegin()
 {
+	namespace fs = std::filesystem;
+	using namespace std::string_literals;
+
 	render_end_t EndType = SONG_TIME_LIMIT;
 	int EndParam = 0;
 
@@ -125,6 +144,56 @@ void CCreateWaveDlg::OnBnClickedBegin()
 		EndType = SONG_TIME_LIMIT;
 		EndParam = GetTimeLimit();
 	}
+
+
+
+	CString outPathC = SaveDialog.GetPathName();
+	fs::path outPath = conv::to_utf8(outPathC);
+
+	auto nchan = m_ctlChannelList.GetCount();
+	{
+		// Mute selected channels
+		pView->UnmuteAllChannels();
+		for (int i = 0; i < nchan; ++i) {
+			if (m_ctlChannelList.GetCheck(i) == BST_UNCHECKED)
+				pView->ToggleChannel(i);
+		}
+
+		// Show the render progress dialog, this will also start rendering
+		CWavProgressDlg ProgressDlg;
+		ProgressDlg.BeginRender(outPathC, EndType, EndParam, Track);
+		// TODO if cancelled early, abort further rendering.
+	}
+
+	if (IsDlgButtonChecked(IDC_CHECK_INDIVIDUAL_CHANNELS)) {
+		for (int i = 0; i < nchan; ++i) {
+			if (m_ctlChannelList.GetCheck(i) == BST_CHECKED) {
+				pView->MuteAllChannels();
+				pView->ToggleChannel(i);
+
+				// Write wav file to same name as above, but with a suffix before the extension.
+				CString chanNameC; m_ctlChannelList.GetText(i, chanNameC);
+
+				CString textC;
+				textC.Format(_T("%02i - "), i + 1);
+				textC.Append(chanNameC);
+
+				std::string text = conv::to_utf8(textC);
+
+				fs::path chanOutPath = outPath;
+				chanOutPath.replace_filename("");
+				chanOutPath += text + ".wav"s;
+
+				CString chanOutPathC = conv::to_t(chanOutPath.string()).c_str();
+
+				CWavProgressDlg ProgressDlg;
+				ProgressDlg.BeginRender(chanOutPathC, EndType, EndParam, Track);
+				// TODO if cancelled early, abort further rendering.
+			}
+		}
+	}
+
+
 
 	pView->UnmuteAllChannels();
 
@@ -228,14 +297,4 @@ void CCreateWaveDlg::OnBnClickedRadioLoop()
 }
 
 
-void CCreateWaveDlg::OnBnClickedCheckIndividualChannels()
-{
-	if (IsDlgButtonChecked(IDC_CHECK_INDIVIDUAL_CHANNELS)) {
-		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(TRUE);
-	}
-	else {
-		GetDlgItem(IDC_CHECK_NONLINEAR_MIXING)->EnableWindow(FALSE);
-		BOOL isUnchecked = false;
-		CheckDlgButton(IDC_CHECK_NONLINEAR_MIXING, isUnchecked);
-	}
-}
+

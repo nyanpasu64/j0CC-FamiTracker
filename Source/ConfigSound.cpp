@@ -72,7 +72,7 @@ BOOL CConfigSound::OnInitDialog()
 
 	// Set ranges
 	pBufSlider->SetRange(1, MAX_BUFFER_LEN);
-	pBassSlider->SetRange(16, 4000);
+	pBassSlider->SetRange(0, 4000);
 	pTrebleSliderFreq->SetRange(20, 20000);
 	pTrebleSliderDamping->SetRange(0, 90);
 	pVolumeSlider->SetRange(0, 100);
