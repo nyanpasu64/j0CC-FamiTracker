@@ -132,6 +132,11 @@ enum {
 	TMR_SCROLL
 };
 
+//UpdateSpeed for TMR_UPDATE
+int TimerUpdateSpeed;
+const int TIMER_SPEED_LOW = 33;
+const int TIMER_SPEED_HIGH = 16;
+
 // CFamiTrackerView
 
 IMPLEMENT_DYNCREATE(CFamiTrackerView, CView)
@@ -379,8 +384,9 @@ int CFamiTrackerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	// Install a timer for screen updates, 20ms
-	SetTimer(TMR_UPDATE, 20, NULL);
+	// Install a timer for screen updates, 20ms for playback, 40 for idle
+	TimerUpdateSpeed = TIMER_SPEED_LOW;
+	SetTimer(TMR_UPDATE, TimerUpdateSpeed, NULL);
 
 	m_DropTarget.Register(this);
 
@@ -824,7 +830,18 @@ void CFamiTrackerView::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent) {
 		// Drawing updates when playing
 		case TMR_UPDATE: 
-			PeriodicUpdate();
+			if (theApp.IsPlaying()) {
+				KillTimer(TMR_UPDATE);
+				TimerUpdateSpeed = TIMER_SPEED_HIGH;
+				SetTimer(TMR_UPDATE, TimerUpdateSpeed, NULL);
+				PeriodicUpdate();
+			}
+			else {
+				KillTimer(TMR_UPDATE);
+				TimerUpdateSpeed = TIMER_SPEED_LOW;
+				SetTimer(TMR_UPDATE, TimerUpdateSpeed, NULL);
+				PeriodicUpdate();
+				}
 			break;
 
 		// Auto-scroll timer
@@ -1176,7 +1193,6 @@ void CFamiTrackerView::OnTrackerPlayrow()
 {
 	CFamiTrackerDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-
 	const int Track = static_cast<CMainFrame*>(GetParentFrame())->GetSelectedTrack();
 	const int Frame = m_pPatternEditor->GetFrame();
 	const int Row = m_pPatternEditor->GetRow();
