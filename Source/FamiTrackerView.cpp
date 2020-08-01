@@ -49,6 +49,7 @@
 
 #include <cmath>
 #include <assert.h>
+#include <iostream>
 
 using std::get_if;
 
@@ -2421,6 +2422,7 @@ bool CFamiTrackerView::IsControlPressed() const
 // OnKeyDown accepts virtual keycodes, and handles most input.
 void CFamiTrackerView::OnKeyDown(UINT key, UINT nRepCnt, UINT nFlags)
 {	
+	std::cerr << MapVirtualKey(key, MAPVK_VK_TO_VSC) << " pressed\n";
 	// Called when a key is pressed
 	if (GetFocus() != this)
 		return;
@@ -2530,7 +2532,7 @@ void CFamiTrackerView::OnChar(UINT chr, UINT _nEvents, UINT flags) {
 		return;
 	}
 
-	HandleKeyboardInput(Character(chr));
+	HandleKeyboardInput(Character{chr});
 }
 
 void CFamiTrackerView::OnSysKeyDown(UINT key, UINT nRepCnt, UINT nFlags)
@@ -2886,9 +2888,9 @@ bool CFamiTrackerView::EditEffNumberColumn(stChanNote &Note, Input input, int Ef
 		effect = (char)key;
 
 	} else if (auto p = get_if<Character>(&input)) {
-		int chr = (int)*p;
+		UINT chr = p->v;
 		assert(!isAlphanumeric(chr));
-		if ((unsigned)chr >= 0x100) {
+		if (chr >= 0x100) {
 			throw std::runtime_error("non-8bit character or something");
 		}
 		effect = (char)chr;

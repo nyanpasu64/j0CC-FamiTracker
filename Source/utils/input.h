@@ -1,6 +1,8 @@
 #pragma once
 
 #include "type_safe/strong_typedef.hpp"
+
+#include <intsafe.h>
 #include <variant>
 #include <utility>
 #include <cstdint>
@@ -11,11 +13,8 @@ namespace ts = type_safe;
 
 using Keycode = int;
 
-struct Character : ts::strong_typedef<Character, int>,
-	ts::strong_typedef_op::equality_comparison<Character>,
-	ts::strong_typedef_op::relational_comparison<Character>
-{
-	using strong_typedef::strong_typedef;
+struct Character {
+	UINT v;
 };
 
 
