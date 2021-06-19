@@ -6,7 +6,7 @@
 
 Additionally I can't let this program continue under its current name. I can't have people talking to me about the program under its current name. I should've renamed the program earlier, but never picked one.
 
-I invite the community to fork the program, possibly under a name like FamiTracker-Next. I may participate if I regain interest.
+**The official successor to this program is [Dn-FamiTracker](https://github.com/Gumball2415/Dn-FamiTracker).** That repository has further changes built on top of FamiTracker, like improving and refactoring sound emulation, though it does not address most other design flaws so far.
 
 ## Readme
 
