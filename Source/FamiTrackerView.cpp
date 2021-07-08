@@ -154,6 +154,7 @@ BEGIN_MESSAGE_MAP(CFamiTrackerView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_MBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_WM_XBUTTONDOWN()		// // //
 	ON_WM_MENUCHAR()
@@ -718,6 +719,11 @@ void CFamiTrackerView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	CView::OnLButtonDblClk(nFlags, point);
 }
 
+void CFamiTrackerView::OnMButtonDown(UINT nFlags, CPoint point) {
+	m_pPatternEditor->onMiddleClick(point);
+	CView::OnMButtonDown(nFlags, point);
+}
+
 void CFamiTrackerView::OnXButtonDown(UINT nFlags, UINT nButton, CPoint point)		// // //
 {
 	/*
@@ -947,7 +953,7 @@ void CFamiTrackerView::OnEditPaste()
 	CPatternClipData *pClipData = new CPatternClipData();
 	pClipData->FromMem(hMem);
 	// Create an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_DEFAULT);		// // //
 	pAction->SetPastePos(m_iPastePos);
@@ -966,7 +972,7 @@ void CFamiTrackerView::OnEditPasteMix()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);		// // //
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);		// // //
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_MIX);		// // //
 	pAction->SetPastePos(m_iPastePos);
@@ -985,7 +991,7 @@ void CFamiTrackerView::OnEditPasteOverwrite()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_OVERWRITE);
 	pAction->SetPastePos(m_iPastePos);
@@ -1004,7 +1010,7 @@ void CFamiTrackerView::OnEditPasteInsert()		// // //
 	pClipData->FromMem(hMem);
 
 	// Add an undo point
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_EDIT_PASTE);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_EDIT_PASTE);
 	pAction->SetPaste(pClipData);
 	pAction->SetPasteMode(PASTE_INSERT);
 	pAction->SetPastePos(m_iPastePos);

@@ -29,10 +29,6 @@ Action::Action(int iAction) : m_iAction(iAction)
 {
 }
 
-Action::~Action()
-{
-}
-
 bool Action::Merge(const Action *Other)		// // //
 {
 	return false;

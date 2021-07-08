@@ -42,6 +42,17 @@
 #include "APU/DPCM.h"		// // //
 #include "RegisterState.h"		// // //
 
+// Duplicate of InstrumentFDS.cpp
+// https://stackoverflow.com/a/14997413/2683842
+inline int modulo(int i, int n) {
+	return (i % n + n) % n;
+}
+
+inline void modulo_by(int &i, int n) {
+	i = modulo(i, n);
+}
+
+
 /*
  * CPatternEditor
  * This is the pattern editor. This class is not derived from any MFC class.
@@ -2504,6 +2515,7 @@ void CPatternEditor::OnEndKey()
 
 void CPatternEditor::MoveCursor(const CCursorPos &Pos)		// // //
 {
+	// TODO validate and modulo... why is this API so unusable?
 	m_cpCursorPos = Pos;
 }
 
@@ -2840,8 +2852,8 @@ void CPatternEditor::OnMouseUp(const CPoint &point)
 
 		// Pattern area
 		CCursorPos PointPos = GetCursorAtPoint(point);
-		PointPos.m_iFrame %= GetFrameCount(); 
-		if (PointPos.m_iFrame < 0) PointPos.m_iFrame += GetFrameCount();		// // //
+		
+		modulo_by(PointPos.m_iFrame, GetFrameCount());
 		const int PatternLength = GetCurrentPatternLength(PointPos.m_iFrame);		// // //
 
 		if (IsInsideRowColumn(point)) {
@@ -3067,6 +3079,32 @@ void CPatternEditor::OnMouseDblClk(const CPoint &point)
 			// Select whole channel
 			SelectChannel();
 	}
+}
+
+void CPatternEditor::onMiddleClick(CPoint point) {
+	if (!IsInsidePattern(point)) return;
+
+	CCursorPos pos = GetCursorAtPoint(point);
+	// begin hot garbage API
+	modulo_by(pos.m_iFrame, GetFrameCount());
+
+	const int patternLength = GetCurrentPatternLength(pos.m_iFrame);
+	const int channelCount = GetChannelCount();
+	
+	if (pos.IsValid(patternLength, channelCount)) {		// // //
+		this->MoveCursor(pos);
+		// All this checking should be incorporated into MoveCursor...
+		// """but the previous user didn't need it"""
+		// end hot garbage API
+	} else {
+		// will this ever happen?
+		// YES, when you middle-click the row numbers.
+	}
+	// If I set m_bMouseActive and use OnMouseUp to set cursor, it clears
+	// the selection.
+
+	auto action = std::make_unique<SwapPasteAction>();
+	GetMainFrame()->AddAction(action.release());
 }
 
 void CPatternEditor::OnMouseScroll(int Delta)
@@ -3342,7 +3380,7 @@ void CPatternEditor::Paste(const CPatternClipData *pClipData, const paste_mode_t
 	const int f = AtSel ? m_selection.GetFrameStart() : (PastePos == PASTE_DRAG ? m_selDrag.GetFrameStart() : m_cpCursorPos.m_iFrame);
 	const unsigned int r = AtSel ? m_selection.GetRowStart() : (PastePos == PASTE_DRAG ? m_selDrag.GetRowStart() : m_cpCursorPos.m_iRow);
 	const unsigned int c = AtSel ? m_selection.GetChanStart() : (PastePos == PASTE_DRAG ? m_selDrag.GetChanStart() : m_cpCursorPos.m_iChannel);
-	const unsigned int CEnd = std::min(Channels + c, ChannelCount);
+	const unsigned int CEnd = std::min(c + Channels, ChannelCount);
 
 	CPatternIterator it = CPatternIterator(m_pDocument, Track, CCursorPos(r, c, GetCursorStartColumn(StartColumn), f));		// // //
 	stChanNote NoteData, Source;
@@ -4139,7 +4177,7 @@ bool CPatternEditor::PerformDrop(const CPatternClipData *pClipData, bool bCopy, 
 
 	m_bSelecting = true;
 
-	CPatternAction *pAction = new CPatternAction(CPatternAction::ACT_DRAG_AND_DROP);
+	PasteAction *pAction = new PasteAction(CPatternAction::ACT_DRAG_AND_DROP);
 	pAction->SetDragAndDrop(pClipData, bDelete, bMix, &m_selDrag);
 	GetMainFrame()->AddAction(pAction);
 

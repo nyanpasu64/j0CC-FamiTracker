@@ -128,6 +128,7 @@ public:
 	bool OnMouseNcMove();
 	void OnMouseMove(UINT nFlags, const CPoint &point);
 	void OnMouseDblClk(const CPoint &point);
+	void onMiddleClick(CPoint point);
 	void OnMouseScroll(int Delta);
 	void OnMouseRDown(const CPoint &point);
 
@@ -142,9 +143,9 @@ public:
 
 	// Edit: Copy & paste, selection
 	CPatternClipData *CopyEntire() const;
-	CPatternClipData *Copy() const;
-	CPatternClipData *CopyRaw() const;		// // //
-	CPatternClipData *CopyRaw(const CSelection &Sel) const;		// // //
+	CPatternClipData *Copy() const;			// paste wherever
+	CPatternClipData *CopyRaw() const;		// paste in the same spot
+	CPatternClipData *CopyRaw(const CSelection &Sel) const;
 	void Cut();
 	void PasteEntire(const CPatternClipData *pClipData);
 	void Paste(const CPatternClipData *pClipData, const paste_mode_t PasteMode, const paste_pos_t PastePos);		// // //
