@@ -308,7 +308,7 @@ void CFrameEditor::DrawFrameEditor(CDC *pDC)
 		// // // Highlight by bookmarks
 		if (i != m_iMiddleRow) if (const unsigned Count = pCol->GetCount()) for (unsigned j = 0; j < Count; ++j)
 			if (pCol->GetBookmark(j)->m_iFrame == Frame) {
-				GradientBar(&m_dcBack, RowRect, theApp.GetSettings()->Appearance.iColBackgroundHilite, ColBackground);
+				GradientBar(&m_dcBack, RowRect, theApp.GetSettings()->Appearance.iColBackgroundHilite2, ColBackground);
 				break;
 			}
 
